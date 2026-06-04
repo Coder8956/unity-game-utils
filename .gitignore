@@ -2,3 +2,7 @@ TFGUtilsProject/Library/
 TFGUtilsProject/Temp/
 TFGUtilsProject/UserSettings/
 TFGUtilsProject/obj/
+TFGUtilsProject/Logs/
+TFGUtilsProject/.vsconfig
+*.slnx
+*.csproj
