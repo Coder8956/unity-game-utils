@@ -14,7 +14,7 @@ namespace UGU.Runtime
     /// 大多数情况下可直接使用 <see cref="UGUListPropertyWrapper{T}"/>.
     /// </summary>
     [Serializable]
-    public abstract class UGUListPropertyBaseWrapper<T> : UGUWrapperBase
+    public abstract class UGUListPropertyWrapperBase<T> : UGUWrapperBase
     {
         /// <summary>
         /// 序列化值列表 — Unity 可序列化 (T 在子类中为具体类型)
@@ -287,7 +287,7 @@ namespace UGU.Runtime
     /// 列表容器包装默认实现 — 可直接实例化使用
     /// </summary>
     [Serializable]
-    public class UGUListPropertyWrapper<T> : UGUListPropertyBaseWrapper<T>
+    public class UGUListPropertyWrapper<T> : UGUListPropertyWrapperBase<T>
     {
     }
 }

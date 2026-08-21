@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Reflection;
 
-namespace UGUE.Editor.Utils
+namespace UGU.Editor
 {
-    public class EUGUUtilCommon
+    public class EUGUCommonUtils
     {
         /// <summary>
         /// 获取对象的非公共方法

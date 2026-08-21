@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using UGU.Runtime;
 
-namespace UGUE.Editor.UGUProperty
+namespace UGU.Editor
 {
     /// <summary>
     /// UGUWrapperBase 及其子类的统一 PropertyDrawer
@@ -15,9 +15,9 @@ namespace UGUE.Editor.UGUProperty
     /// 所以 wrapper 内部维护了可序列化的原始值字段 (m_value / m_values).
     ///
     /// 绘制规则 (参考 Unity Inspector 序列化):
-    /// - UGUPropertyBaseWrapper&lt;T&gt;: 直接绘制原子值 (m_value)
-    /// - UGUListPropertyBaseWrapper&lt;T&gt;: 按 index 绘制, 每行 index + value (m_values)
-    /// - UGUDictPropertyBaseWrapper&lt;TKey, T&gt;: 按 key 绘制, 每行 key + value (Dict 反射)
+    /// - UGUPropertyWrapperBase&lt;T&gt;: 直接绘制原子值 (m_value)
+    /// - UGUListPropertyWrapperBase&lt;T&gt;: 按 index 绘制, 每行 index + value (m_values)
+    /// - UGUDictPropertyWrapperBase&lt;TKey, T&gt;: 按 key 绘制, 每行 key + value (Dict 反射)
     /// </summary>
     [CustomPropertyDrawer(typeof(UGUWrapperBase), true)]
     public class EUGUWrapperDrawer : PropertyDrawer
@@ -30,7 +30,7 @@ namespace UGUE.Editor.UGUProperty
 
         private const float Spacing = 2f;
 
-        private static readonly Dictionary<string, bool> s_foldoutStates = new();
+        private static readonly Dictionary<string, bool> FoldoutStates = new();
 
         // ── 公共入口 ──────────────────────────────────────────────
 
@@ -45,15 +45,15 @@ namespace UGUE.Editor.UGUProperty
 
             var wrapperType = wrapper.GetType();
 
-            if (IsSubclassOfRawGeneric(typeof(UGUPropertyBaseWrapper<>), wrapperType))
+            if (IsSubclassOfRawGeneric(typeof(UGUPropertyWrapperBase<>), wrapperType))
             {
                 DrawSingleValue(position, property, wrapper, label);
             }
-            else if (IsSubclassOfRawGeneric(typeof(UGUListPropertyBaseWrapper<>), wrapperType))
+            else if (IsSubclassOfRawGeneric(typeof(UGUListPropertyWrapperBase<>), wrapperType))
             {
                 DrawList(position, property, wrapper, label);
             }
-            else if (IsSubclassOfRawGeneric(typeof(UGUDictPropertyBaseWrapper<,>), wrapperType))
+            else if (IsSubclassOfRawGeneric(typeof(UGUDictPropertyWrapperBase<,>), wrapperType))
             {
                 DrawDict(position, property, wrapper, label);
             }
@@ -71,13 +71,13 @@ namespace UGUE.Editor.UGUProperty
 
             var wrapperType = wrapper.GetType();
 
-            if (IsSubclassOfRawGeneric(typeof(UGUPropertyBaseWrapper<>), wrapperType))
+            if (IsSubclassOfRawGeneric(typeof(UGUPropertyWrapperBase<>), wrapperType))
                 return EditorGUIUtility.singleLineHeight;
 
-            if (IsSubclassOfRawGeneric(typeof(UGUListPropertyBaseWrapper<>), wrapperType))
+            if (IsSubclassOfRawGeneric(typeof(UGUListPropertyWrapperBase<>), wrapperType))
                 return GetListHeight(property, wrapper);
 
-            if (IsSubclassOfRawGeneric(typeof(UGUDictPropertyBaseWrapper<,>), wrapperType))
+            if (IsSubclassOfRawGeneric(typeof(UGUDictPropertyWrapperBase<,>), wrapperType))
                 return GetDictHeight(property, wrapper);
 
             return EditorGUIUtility.singleLineHeight;
@@ -95,7 +95,11 @@ namespace UGUE.Editor.UGUProperty
             {
                 var newValue = DrawTypedValue(position, value, valueType, label);
                 if (scope.changed && !Equals(newValue, value))
+                {
+                    Undo.RecordObject(property.serializedObject.targetObject, "Modify Value");
                     CallModify(wrapper, newValue, valueType);
+                    EditorUtility.SetDirty(property.serializedObject.targetObject);
+                }
             }
             EditorGUI.EndProperty();
         }
@@ -105,7 +109,6 @@ namespace UGUE.Editor.UGUProperty
         private void DrawList(Rect position, SerializedProperty property, object wrapper, GUIContent label)
         {
             var list = GetFieldValue(wrapper, ValuesFieldName) as IList;
-            var path = property.propertyPath;
 
             EditorGUI.BeginProperty(position, label, property);
 
@@ -113,9 +116,9 @@ namespace UGUE.Editor.UGUProperty
             var foldoutRect = new Rect(position.x, y, position.width, EditorGUIUtility.singleLineHeight);
 
             int count = list?.Count ?? 0;
-            bool expanded = GetFoldout(path);
+            bool expanded = GetFoldout(property);
             expanded = EditorGUI.Foldout(foldoutRect, expanded, $"{label.text} [{count}]", true);
-            SetFoldout(path, expanded);
+            SetFoldout(property, expanded);
             y += EditorGUIUtility.singleLineHeight + Spacing;
 
             if (!expanded || list == null || list.Count == 0)
@@ -123,9 +126,7 @@ namespace UGUE.Editor.UGUProperty
                 if (expanded && (list == null || list.Count == 0))
                 {
                     var rect = new Rect(position.x, y, position.width, EditorGUIUtility.singleLineHeight);
-                    EditorGUI.indentLevel++;
                     EditorGUI.LabelField(rect, "(空)");
-                    EditorGUI.indentLevel--;
                 }
                 EditorGUI.EndProperty();
                 return;
@@ -133,7 +134,6 @@ namespace UGUE.Editor.UGUProperty
 
             var valueType = GetGenericArgument(wrapper, 0);
 
-            EditorGUI.indentLevel++;
             for (int i = 0; i < list.Count; i++)
             {
                 var value = list[i];
@@ -152,12 +152,15 @@ namespace UGUE.Editor.UGUProperty
                     EditorGUI.LabelField(indexRect, $"[{i}]");
                     var newValue = DrawTypedValue(valueRect, value, valueType, GUIContent.none);
                     if (scope.changed && !Equals(newValue, value))
+                    {
+                        Undo.RecordObject(property.serializedObject.targetObject, "Modify List Value");
                         CallModify(wrapper, i, newValue, valueType);
+                        EditorUtility.SetDirty(property.serializedObject.targetObject);
+                    }
                 }
 
                 y += EditorGUIUtility.singleLineHeight + Spacing;
             }
-            EditorGUI.indentLevel--;
 
             EditorGUI.EndProperty();
         }
@@ -166,7 +169,7 @@ namespace UGUE.Editor.UGUProperty
         {
             float height = EditorGUIUtility.singleLineHeight + Spacing;
 
-            if (!GetFoldout(property.propertyPath))
+            if (!GetFoldout(property))
                 return height;
 
             var list = GetFieldValue(wrapper, ValuesFieldName) as IList;
@@ -181,7 +184,6 @@ namespace UGUE.Editor.UGUProperty
         private void DrawDict(Rect position, SerializedProperty property, object wrapper, GUIContent label)
         {
             var dict = GetPropertyValue(wrapper, DictPropertyName) as IDictionary;
-            var path = property.propertyPath;
 
             EditorGUI.BeginProperty(position, label, property);
 
@@ -189,9 +191,9 @@ namespace UGUE.Editor.UGUProperty
             var foldoutRect = new Rect(position.x, y, position.width, EditorGUIUtility.singleLineHeight);
 
             int count = dict?.Count ?? 0;
-            bool expanded = GetFoldout(path);
+            bool expanded = GetFoldout(property);
             expanded = EditorGUI.Foldout(foldoutRect, expanded, $"{label.text} [{count}]", true);
-            SetFoldout(path, expanded);
+            SetFoldout(property, expanded);
             y += EditorGUIUtility.singleLineHeight + Spacing;
 
             if (!expanded || dict == null || dict.Count == 0)
@@ -199,9 +201,7 @@ namespace UGUE.Editor.UGUProperty
                 if (expanded && (dict == null || dict.Count == 0))
                 {
                     var rect = new Rect(position.x, y, position.width, EditorGUIUtility.singleLineHeight);
-                    EditorGUI.indentLevel++;
                     EditorGUI.LabelField(rect, "(空)");
-                    EditorGUI.indentLevel--;
                 }
                 EditorGUI.EndProperty();
                 return;
@@ -210,7 +210,6 @@ namespace UGUE.Editor.UGUProperty
             var keyType = GetGenericArgument(wrapper, 0);
             var valueType = GetGenericArgument(wrapper, 1);
 
-            EditorGUI.indentLevel++;
             foreach (DictionaryEntry entry in dict)
             {
                 var key = entry.Key;
@@ -229,17 +228,28 @@ namespace UGUE.Editor.UGUProperty
                     rowRect.width - keyWidth - Spacing,
                     rowRect.height);
 
-                using (var scope = new EditorGUI.ChangeCheckScope())
+                EditorGUI.LabelField(keyRect, key?.ToString() ?? "null");
+
+                if (valueInfo != null)
                 {
-                    EditorGUI.LabelField(keyRect, key?.ToString() ?? "null");
-                    var newValue = DrawTypedValue(valueRect, value, actualValueType, GUIContent.none);
-                    if (scope.changed && !Equals(newValue, value))
-                        CallModify(wrapper, key, keyType, newValue, actualValueType);
+                    using (var scope = new EditorGUI.ChangeCheckScope())
+                    {
+                        var newValue = DrawTypedValue(valueRect, value, actualValueType, GUIContent.none);
+                        if (scope.changed && !Equals(newValue, value))
+                        {
+                            Undo.RecordObject(property.serializedObject.targetObject, "Modify Dict Value");
+                            CallModify(wrapper, key, keyType, newValue, actualValueType);
+                            EditorUtility.SetDirty(property.serializedObject.targetObject);
+                        }
+                    }
+                }
+                else
+                {
+                    EditorGUI.LabelField(valueRect, prop == null ? "(未初始化)" : "(无法读取)");
                 }
 
                 y += EditorGUIUtility.singleLineHeight + Spacing;
             }
-            EditorGUI.indentLevel--;
 
             EditorGUI.EndProperty();
         }
@@ -248,7 +258,7 @@ namespace UGUE.Editor.UGUProperty
         {
             float height = EditorGUIUtility.singleLineHeight + Spacing;
 
-            if (!GetFoldout(property.propertyPath))
+            if (!GetFoldout(property))
                 return height;
 
             var dict = GetPropertyValue(wrapper, DictPropertyName) as IDictionary;
@@ -262,18 +272,50 @@ namespace UGUE.Editor.UGUProperty
 
         private static object DrawTypedValue(Rect rect, object value, Type type, GUIContent label)
         {
+            // 整数类型
             if (type == typeof(int))
                 return EditorGUI.IntField(rect, label, (int)value);
+            if (type == typeof(uint))
+                return (uint)EditorGUI.LongField(rect, label, (long)(uint)value);
+            if (type == typeof(long))
+                return EditorGUI.LongField(rect, label, (long)value);
+            if (type == typeof(ulong))
+            {
+                var str = EditorGUI.TextField(rect, label, value?.ToString() ?? "0");
+                return ulong.TryParse(str, out var result) ? result : value;
+            }
+            if (type == typeof(short))
+                return (short)EditorGUI.IntField(rect, label, (short)value);
+            if (type == typeof(ushort))
+                return (ushort)EditorGUI.IntField(rect, label, (ushort)value);
+            if (type == typeof(byte))
+                return (byte)EditorGUI.IntField(rect, label, (byte)value);
+            if (type == typeof(sbyte))
+                return (sbyte)EditorGUI.IntField(rect, label, (sbyte)value);
+
+            // 浮点类型
             if (type == typeof(float))
                 return EditorGUI.FloatField(rect, label, (float)value);
             if (type == typeof(double))
                 return EditorGUI.DoubleField(rect, label, (double)value);
-            if (type == typeof(long))
-                return EditorGUI.LongField(rect, label, (long)value);
+            if (type == typeof(decimal))
+            {
+                var str = EditorGUI.TextField(rect, label, value?.ToString() ?? "0");
+                return decimal.TryParse(str, out var result) ? result : value;
+            }
+
+            // 其他原始类型
             if (type == typeof(string))
                 return EditorGUI.TextField(rect, label, (string)value ?? "");
             if (type == typeof(bool))
                 return EditorGUI.Toggle(rect, label, (bool)value);
+            if (type == typeof(char))
+            {
+                var str = EditorGUI.TextField(rect, label, value == null ? "" : ((char)value).ToString());
+                return str.Length > 0 ? str[0] : '\0';
+            }
+
+            // 扩展类型 (UGUProperty<T> 当前不支持, 保留兼容)
             if (type == typeof(Vector2))
                 return EditorGUI.Vector2Field(rect, label, (Vector2)value);
             if (type == typeof(Vector3))
@@ -406,15 +448,21 @@ namespace UGUE.Editor.UGUProperty
 
         // ── Foldout 状态 ─────────────────────────────────────────
 
-        private static bool GetFoldout(string path)
+        private static string GetFoldoutKey(SerializedProperty property)
         {
-            s_foldoutStates.TryGetValue(path, out bool state);
+            var target = property.serializedObject.targetObject;
+            return $"{target.GetInstanceID()}:{property.propertyPath}";
+        }
+
+        private static bool GetFoldout(SerializedProperty property)
+        {
+            FoldoutStates.TryGetValue(GetFoldoutKey(property), out bool state);
             return state;
         }
 
-        private static void SetFoldout(string path, bool value)
+        private static void SetFoldout(SerializedProperty property, bool value)
         {
-            s_foldoutStates[path] = value;
+            FoldoutStates[GetFoldoutKey(property)] = value;
         }
     }
 }

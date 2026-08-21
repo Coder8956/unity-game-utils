@@ -1,9 +1,7 @@
-﻿using UGUE.Editor.Const;
-using UGUE.Editor.Scene.Const;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
-namespace UGUtils.Editor.DirUtils
+namespace UGU.Editor
 {
     public class EUGUDirUtils
     {

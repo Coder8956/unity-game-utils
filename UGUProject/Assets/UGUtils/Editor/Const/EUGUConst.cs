@@ -1,4 +1,4 @@
-﻿namespace UGUE.Editor.Const
+﻿namespace UGU.Editor
 {
     public class EUGUConst
     {

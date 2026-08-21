@@ -1,44 +1,44 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace UGU.Runtime
 {
     public class UGUThirdPersonCamera : MonoBehaviour
     {
-        [Header("Camera Input")] public string rotateCameraXInput = "Mouse X";
-        public string rotateCameraYInput = "Mouse Y";
+        #region Inspector Properties
 
-        #region inspector properties
+        [SerializeField] private string m_rotateCameraXInput = "Mouse X";
+        [SerializeField] private string m_rotateCameraYInput = "Mouse Y";
 
-        public Transform target;
+        [SerializeField] private Transform m_target;
 
         [Tooltip("Lerp speed between Camera States")]
-        public float smoothCameraRotation = 12f;
+        [SerializeField] private float m_smoothCameraRotation = 12f;
 
-        [Tooltip("What layer will be culled")] public LayerMask cullingLayer = 1 << 0;
+        [Tooltip("What layer will be culled")]
+        [SerializeField] private LayerMask m_cullingLayer = 1 << 0;
 
         [Tooltip("Debug purposes, lock the camera behind the character for better align the states")]
-        public bool lockCamera;
+        [SerializeField] private bool m_lockCamera;
 
-        public float rightOffset = 0f;
+        [SerializeField] private float m_rightOffset = 0f;
 
-        public float defaultDistance = 5f;
-        public float followDistanceMax = 60f;
-        public float followDistanceMin = 1f;
-        public float mouseScrollSpeed = 10f;
+        [SerializeField] private float m_defaultDistance = 5f;
+        [SerializeField] private float m_followDistanceMax = 60f;
+        [SerializeField] private float m_followDistanceMin = 1f;
+        [SerializeField] private float m_mouseScrollSpeed = 10f;
 
-        public float height = 1.4f;
-        public float smoothFollow = 10f;
-        public float xMouseSensitivity = 3f;
-        public float yMouseSensitivity = 3f;
-        public float yMinLimit = -40f;
-        public float yMaxLimit = 80f;
+        [SerializeField] private float m_height = 1.4f;
+        [SerializeField] private float m_smoothFollow = 10f;
+        [SerializeField] private float m_xMouseSensitivity = 3f;
+        [SerializeField] private float m_yMouseSensitivity = 3f;
+        [SerializeField] private float m_yMinLimit = -40f;
+        [SerializeField] private float m_yMaxLimit = 80f;
 
-        public bool m_checkBlockedCulling = false;
+        [SerializeField] private bool m_checkBlockedCulling = false;
 
         #endregion
 
-        #region hide properties
+        #region Hidden Properties
 
         [HideInInspector] public int indexList, indexLookPoint;
         [HideInInspector] public float offSetPlayerPivot;
@@ -46,58 +46,61 @@ namespace UGU.Runtime
         [HideInInspector] public Transform currentTarget;
         [HideInInspector] public Vector2 movementSpeed;
 
-        private Transform targetLookAt;
-        private Vector3 currentTargetPos;
-        private Vector3 lookPoint;
-        private Vector3 current_cPos;
-        private Vector3 desired_cPos;
-        private Camera _camera;
-        private float distance = 5f;
-        private float mouseY = 0f;
-        private float mouseX = 0f;
-        private float currentHeight;
-        private float cullingDistance;
-        private float checkHeightRadius = 0.4f;
-        private float clipPlaneMargin = 0f;
-        private float forward = -1f;
-        private float xMinLimit = -360f;
-        private float xMaxLimit = 360f;
-        private float cullingHeight = 0.2f;
-        private float cullingMinDist = 0.1f;
+        private Transform m_targetLookAt;
+        private Vector3 m_currentTargetPos;
+        private Camera m_camera;
+        private float m_distance = 5f;
+        private float m_mouseY = 0f;
+        private float m_mouseX = 0f;
+        private float m_currentHeight;
+        private float m_cullingDistance;
+        private float m_checkHeightRadius = 0.4f;
+        private float m_clipPlaneMargin = 0f;
+        private float m_forward = -1f;
+        private float m_xMinLimit = -360f;
+        private float m_xMaxLimit = 360f;
+        private float m_cullingHeight = 0.2f;
+        private float m_cullingMinDist = 0.1f;
 
         #endregion
 
         public bool IsEnable { get; set; }
+
+        public Transform Target
+        {
+            get => m_target;
+            set => m_target = value;
+        }
 
         private void Awake()
         {
             IsEnable = true;
         }
 
-        void Start()
+        private void Start()
         {
             Init();
         }
 
         private void Init()
         {
-            if (target == null)
+            if (m_target == null)
                 return;
-            _camera = GetComponent<Camera>();
-            currentTarget = target;
-            currentTargetPos = new Vector3(currentTarget.position.x, currentTarget.position.y + offSetPlayerPivot,
+            m_camera = GetComponent<Camera>();
+            currentTarget = m_target;
+            m_currentTargetPos = new Vector3(currentTarget.position.x, currentTarget.position.y + offSetPlayerPivot,
                 currentTarget.position.z);
 
-            targetLookAt = new GameObject("targetLookAt").transform;
-            targetLookAt.position = currentTarget.position;
-            targetLookAt.hideFlags = HideFlags.HideInHierarchy;
-            targetLookAt.rotation = currentTarget.rotation;
+            m_targetLookAt = new GameObject("targetLookAt").transform;
+            m_targetLookAt.position = currentTarget.position;
+            m_targetLookAt.hideFlags = HideFlags.HideInHierarchy;
+            m_targetLookAt.rotation = currentTarget.rotation;
 
-            mouseY = currentTarget.eulerAngles.x;
-            mouseX = currentTarget.eulerAngles.y;
+            m_mouseY = currentTarget.eulerAngles.x;
+            m_mouseX = currentTarget.eulerAngles.y;
 
-            distance = defaultDistance;
-            currentHeight = height;
+            m_distance = m_defaultDistance;
+            m_currentHeight = m_height;
         }
 
         protected virtual void Update()
@@ -106,10 +109,10 @@ namespace UGU.Runtime
             CameraInput();
         }
 
-        void LateUpdate()
+        private void LateUpdate()
         {
             if (!IsEnable) return;
-            if (target == null || targetLookAt == null) return;
+            if (m_target == null || m_targetLookAt == null) return;
 
             CameraMovement();
         }
@@ -118,40 +121,12 @@ namespace UGU.Runtime
         {
             if (Input.GetMouseButton(1))
             {
-                var Y = Input.GetAxis(rotateCameraYInput);
-                var X = Input.GetAxis(rotateCameraXInput);
+                var y = Input.GetAxis(m_rotateCameraYInput);
+                var x = Input.GetAxis(m_rotateCameraXInput);
 
-                RotateCamera(X, Y);
+                RotateCamera(x, y);
             }
         }
-
-        // /// <summary>
-        // /// Set the target for the camera
-        // /// </summary>
-        // /// <param name="New cursorObject"></param>
-        // public void SetTarget(Transform newTarget)
-        // {
-        //     currentTarget = newTarget ? newTarget : target;
-        // }
-        //
-        // public void SetMainTarget(Transform newTarget)
-        // {
-        //     target = newTarget;
-        //     currentTarget = newTarget;
-        //     mouseY = currentTarget.rotation.eulerAngles.x;
-        //     mouseX = currentTarget.rotation.eulerAngles.y;
-        //     Init();
-        // }
-        //
-        // /// <summary>    
-        // /// Convert a point in the screen in a Ray for the world
-        // /// </summary>
-        // /// <param name="Point"></param>
-        // /// <returns></returns>
-        // public Ray ScreenPointToRay(Vector3 Point)
-        // {
-        //     return this.GetComponent<Camera>().ScreenPointToRay(Point);
-        // }
 
         /// <summary>
         /// Camera Rotation behaviour
@@ -160,28 +135,28 @@ namespace UGU.Runtime
         /// <param name="y"></param>
         private void RotateCamera(float x, float y)
         {
-            // free rotation 
-            mouseX += x * xMouseSensitivity;
-            mouseY -= y * yMouseSensitivity;
+            // free rotation
+            m_mouseX += x * m_xMouseSensitivity;
+            m_mouseY -= y * m_yMouseSensitivity;
 
             movementSpeed.x = x;
             movementSpeed.y = -y;
-            if (!lockCamera)
+            if (!m_lockCamera)
             {
-                mouseY = ClampAngle(mouseY, yMinLimit, yMaxLimit);
-                mouseX = ClampAngle(mouseX, xMinLimit, xMaxLimit);
+                m_mouseY = ClampAngle(m_mouseY, m_yMinLimit, m_yMaxLimit);
+                m_mouseX = ClampAngle(m_mouseX, m_xMinLimit, m_xMaxLimit);
             }
             else
             {
-                mouseY = currentTarget.root.localEulerAngles.x;
-                mouseX = currentTarget.root.localEulerAngles.y;
+                m_mouseY = currentTarget.root.localEulerAngles.x;
+                m_mouseX = currentTarget.root.localEulerAngles.y;
             }
         }
 
         /// <summary>
         /// Camera behaviour
-        /// </summary>    
-        void CameraMovement()
+        /// </summary>
+        private void CameraMovement()
         {
             if (currentTarget == null)
                 return;
@@ -190,78 +165,73 @@ namespace UGU.Runtime
 
             if (scroll != 0f)
             {
-                defaultDistance -= scroll * mouseScrollSpeed;
-                defaultDistance = Mathf.Clamp(defaultDistance, followDistanceMin, followDistanceMax);
-                // Debug.Log("鼠标滚轮向上滚动：" + scroll);
+                m_defaultDistance -= scroll * m_mouseScrollSpeed;
+                m_defaultDistance = Mathf.Clamp(m_defaultDistance, m_followDistanceMin, m_followDistanceMax);
             }
-            // else if (scroll < 0f)
-            // {
-            //     // Debug.Log("鼠标滚轮向下滚动：" + scroll);
-            // }
 
-            distance = Mathf.Lerp(distance, defaultDistance, smoothFollow * Time.deltaTime);
-            cullingDistance = Mathf.Lerp(cullingDistance, distance, Time.deltaTime);
-            var camDir = (forward * targetLookAt.forward) + (rightOffset * targetLookAt.right);
+            m_distance = Mathf.Lerp(m_distance, m_defaultDistance, m_smoothFollow * Time.deltaTime);
+            m_cullingDistance = Mathf.Lerp(m_cullingDistance, m_distance, Time.deltaTime);
+            var camDir = (m_forward * m_targetLookAt.forward) + (m_rightOffset * m_targetLookAt.right);
 
             camDir = camDir.normalized;
 
             var targetPos = new Vector3(currentTarget.position.x, currentTarget.position.y + offSetPlayerPivot,
                 currentTarget.position.z);
-            currentTargetPos = targetPos;
-            desired_cPos = targetPos + new Vector3(0, height, 0);
-            current_cPos = currentTargetPos + new Vector3(0, currentHeight, 0);
+            m_currentTargetPos = targetPos;
+            var desiredCPos = targetPos + new Vector3(0, m_height, 0);
+            var currentCPos = m_currentTargetPos + new Vector3(0, m_currentHeight, 0);
 
             if (m_checkBlockedCulling)
             {
                 RaycastHit hitInfo;
 
-                ClipPlanePoints planePoints =
-                    NearClipPlanePoints(_camera, current_cPos + (camDir * (distance)), clipPlaneMargin);
-                ClipPlanePoints oldPoints =
-                    NearClipPlanePoints(_camera, desired_cPos + (camDir * distance), clipPlaneMargin);
+                UGUClipPlanePoints planePoints =
+                    NearUGUClipPlanePoints(m_camera, currentCPos + (camDir * (m_distance)), m_clipPlaneMargin);
+                UGUClipPlanePoints oldPoints =
+                    NearUGUClipPlanePoints(m_camera, desiredCPos + (camDir * m_distance), m_clipPlaneMargin);
 
-                //Check if Height is not blocked 
-                if (Physics.SphereCast(targetPos, checkHeightRadius, Vector3.up, out hitInfo, cullingHeight + 0.2f,
-                    cullingLayer))
+                //Check if Height is not blocked
+                if (Physics.SphereCast(targetPos, m_checkHeightRadius, Vector3.up, out hitInfo, m_cullingHeight + 0.2f,
+                    m_cullingLayer))
                 {
                     var t = hitInfo.distance - 0.2f;
-                    t -= height;
-                    t /= (cullingHeight - height);
-                    cullingHeight = Mathf.Lerp(height, cullingHeight, Mathf.Clamp(t, 0.0f, 1.0f));
+                    t -= m_height;
+                    t /= (m_cullingHeight - m_height);
+                    m_cullingHeight = Mathf.Lerp(m_height, m_cullingHeight, Mathf.Clamp(t, 0.0f, 1.0f));
                 }
 
-                //Check if desired target position is not blocked       
-                if (CullingRayCast(desired_cPos, oldPoints, out hitInfo, distance + 0.2f, cullingLayer, Color.blue))
+                //Check if desired target position is not blocked
+                if (CullingRayCast(desiredCPos, oldPoints, out hitInfo, m_distance + 0.2f, m_cullingLayer, Color.blue))
                 {
-                    distance = hitInfo.distance - 0.2f;
-                    if (distance < defaultDistance)
+                    m_distance = hitInfo.distance - 0.2f;
+                    if (m_distance < m_defaultDistance)
                     {
                         var t = hitInfo.distance;
-                        t -= cullingMinDist;
-                        t /= cullingMinDist;
-                        currentHeight = Mathf.Lerp(cullingHeight, height, Mathf.Clamp(t, 0.0f, 1.0f));
-                        current_cPos = currentTargetPos + new Vector3(0, currentHeight, 0);
+                        t -= m_cullingMinDist;
+                        t /= m_cullingMinDist;
+                        m_currentHeight = Mathf.Lerp(m_cullingHeight, m_height, Mathf.Clamp(t, 0.0f, 1.0f));
+                        currentCPos = m_currentTargetPos + new Vector3(0, m_currentHeight, 0);
                     }
                 }
                 else
                 {
-                    currentHeight = height;
+                    m_currentHeight = m_height;
                 }
 
                 //Check if target position with culling height applied is not blocked
-                if (CullingRayCast(current_cPos, planePoints, out hitInfo, distance, cullingLayer, Color.cyan))
-                    distance = Mathf.Clamp(cullingDistance, 0.0f, defaultDistance);
+                if (CullingRayCast(currentCPos, planePoints, out hitInfo, m_distance, m_cullingLayer, Color.cyan))
+                    m_distance = Mathf.Clamp(m_cullingDistance, 0.0f, m_defaultDistance);
             }
 
-            var lookPoint = current_cPos + targetLookAt.forward * 2f;
-            lookPoint += (targetLookAt.right * Vector3.Dot(camDir * (distance), targetLookAt.right));
-            targetLookAt.position = current_cPos;
+            var calculatedLookPoint = currentCPos + m_targetLookAt.forward * 2f;
+            calculatedLookPoint += (m_targetLookAt.right * Vector3.Dot(camDir * (m_distance), m_targetLookAt.right));
+            m_targetLookAt.position = currentCPos;
 
-            Quaternion newRot = Quaternion.Euler(mouseY, mouseX, 0);
-            targetLookAt.rotation =
-                Quaternion.Slerp(targetLookAt.rotation, newRot, smoothCameraRotation * Time.deltaTime);
-            transform.position = current_cPos + (camDir * (distance));
-            var rotation = Quaternion.LookRotation((lookPoint) - transform.position);
+            Quaternion newRot = Quaternion.Euler(m_mouseY, m_mouseX, 0);
+            m_targetLookAt.rotation =
+                Quaternion.Slerp(m_targetLookAt.rotation, newRot, m_smoothCameraRotation * Time.deltaTime);
+            transform.position = currentCPos + (camDir * (m_distance));
+            var rotation = Quaternion.LookRotation(calculatedLookPoint - transform.position);
 
             transform.rotation = rotation;
             movementSpeed = Vector2.zero;
@@ -270,39 +240,39 @@ namespace UGU.Runtime
         /// <summary>
         /// Custom Raycast using NearClipPlanesPoints
         /// </summary>
-        /// <param name="_to"></param>
+        /// <param name="to"></param>
         /// <param name="from"></param>
         /// <param name="hitInfo"></param>
         /// <param name="distance"></param>
         /// <param name="cullingLayer"></param>
         /// <returns></returns>
-        bool CullingRayCast(Vector3 from, ClipPlanePoints _to, out RaycastHit hitInfo, float distance,
+        private bool CullingRayCast(Vector3 from, UGUClipPlanePoints to, out RaycastHit hitInfo, float distance,
             LayerMask cullingLayer, Color color)
         {
             bool value = false;
 
-            if (Physics.Raycast(from, _to.LowerLeft - from, out hitInfo, distance, cullingLayer))
+            if (Physics.Raycast(from, to.LowerLeft - from, out hitInfo, distance, cullingLayer))
             {
                 value = true;
-                cullingDistance = hitInfo.distance;
+                m_cullingDistance = hitInfo.distance;
             }
 
-            if (Physics.Raycast(from, _to.LowerRight - from, out hitInfo, distance, cullingLayer))
+            if (Physics.Raycast(from, to.LowerRight - from, out hitInfo, distance, cullingLayer))
             {
                 value = true;
-                if (cullingDistance > hitInfo.distance) cullingDistance = hitInfo.distance;
+                if (m_cullingDistance > hitInfo.distance) m_cullingDistance = hitInfo.distance;
             }
 
-            if (Physics.Raycast(from, _to.UpperLeft - from, out hitInfo, distance, cullingLayer))
+            if (Physics.Raycast(from, to.UpperLeft - from, out hitInfo, distance, cullingLayer))
             {
                 value = true;
-                if (cullingDistance > hitInfo.distance) cullingDistance = hitInfo.distance;
+                if (m_cullingDistance > hitInfo.distance) m_cullingDistance = hitInfo.distance;
             }
 
-            if (Physics.Raycast(from, _to.UpperRight - from, out hitInfo, distance, cullingLayer))
+            if (Physics.Raycast(from, to.UpperRight - from, out hitInfo, distance, cullingLayer))
             {
                 value = true;
-                if (cullingDistance > hitInfo.distance) cullingDistance = hitInfo.distance;
+                if (m_cullingDistance > hitInfo.distance) m_cullingDistance = hitInfo.distance;
             }
 
             return hitInfo.collider && value;
@@ -321,9 +291,9 @@ namespace UGU.Runtime
             return Mathf.Clamp(angle, min, max);
         }
 
-        private static ClipPlanePoints NearClipPlanePoints(Camera camera, Vector3 pos, float clipPlaneMargin)
+        private static UGUClipPlanePoints NearUGUClipPlanePoints(Camera camera, Vector3 pos, float clipPlaneMargin)
         {
-            var clipPlanePoints = new ClipPlanePoints();
+            var clipPlanePoints = new UGUClipPlanePoints();
 
             var transform = camera.transform;
             var halfFOV = (camera.fieldOfView / 2) * Mathf.Deg2Rad;
@@ -352,7 +322,7 @@ namespace UGU.Runtime
             return clipPlanePoints;
         }
 
-        private struct ClipPlanePoints
+        private struct UGUClipPlanePoints
         {
             public Vector3 UpperLeft;
             public Vector3 UpperRight;

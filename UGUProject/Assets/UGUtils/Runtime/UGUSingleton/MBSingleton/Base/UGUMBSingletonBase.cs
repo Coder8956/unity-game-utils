@@ -2,7 +2,7 @@
 
 namespace UGU.Runtime
 {
-    public abstract class BaseMBSingleton : MonoBehaviour
+    public abstract class UGUMBSingletonBase : MonoBehaviour
     {
         protected abstract void OnCreate();
     }

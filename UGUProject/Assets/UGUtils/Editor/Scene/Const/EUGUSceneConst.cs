@@ -1,6 +1,4 @@
-﻿using UGUE.Editor.Const;
-
-namespace UGUE.Editor.Scene.Const
+﻿namespace UGU.Editor
 {
     public class EUGUSceneConst
     {

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace UGUE.Editor.Utils
+namespace UGU.Editor
 {
-    public class EUGUUtilsGO
+    public class EUGUGOUtils
     {
         /// <summary>
         /// 清理子物体

@@ -15,7 +15,7 @@ namespace UGU.Runtime
     /// 大多数情况下可直接使用 <see cref="UGUDictPropertyWrapper{TKey, T}"/>.
     /// </summary>
     [Serializable]
-    public abstract class UGUDictPropertyBaseWrapper<TKey, T> : UGUWrapperBase
+    public abstract class UGUDictPropertyWrapperBase<TKey, T> : UGUWrapperBase
     {
         /// <summary>
         /// 底层字典容器 — Dictionary 不可被 Unity 序列化, 运行时通过反射读取
@@ -245,7 +245,7 @@ namespace UGU.Runtime
     /// 字典容器包装默认实现 — 可直接实例化使用
     /// </summary>
     [Serializable]
-    public class UGUDictPropertyWrapper<TKey, T> : UGUDictPropertyBaseWrapper<TKey, T>
+    public class UGUDictPropertyWrapper<TKey, T> : UGUDictPropertyWrapperBase<TKey, T>
     {
     }
 }

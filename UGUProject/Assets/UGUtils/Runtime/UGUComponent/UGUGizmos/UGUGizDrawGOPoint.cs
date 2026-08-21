@@ -14,20 +14,11 @@ namespace UGU.Runtime
             set => m_gizmoColor = value;
         }
 
-        void OnDrawGizmos()
+        private void OnDrawGizmos()
         {
             if (!m_isDraw) return;
             Gizmos.color = m_gizmoColor;
             Gizmos.DrawSphere(transform.position, m_radius);
         }
-
-        /// <summary>
-        /// 只有当该 GameObject 处于选中状态时，Gizmos 才会被绘制。
-        /// </summary>
-        // void OnDrawGizmosSelected()
-        // {
-        //     Gizmos.color = m_gizmoColor;
-        //     Gizmos.DrawSphere(transform.position, m_radius);
-        // }
     }
 }

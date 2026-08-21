@@ -7,7 +7,7 @@ namespace UGU.Runtime
     {
         [SerializeField] private float m_moveSpeed = 5f; // 移动速度
         [SerializeField] private float m_turnSpeed = 10f; // 转向速度
-        [SerializeField] private bool m_isRigRreezeRotation = true;
+        [SerializeField] private bool m_isRigFreezeRotation = true;
         [SerializeField] private Transform m_cameraTransform;
 
         public Transform CameraTransform
@@ -20,15 +20,12 @@ namespace UGU.Runtime
 
         public bool IsEnable { get; set; }
 
-        void Awake()
+        private void Awake()
         {
             // 获取Rigidbody组件
             m_rb = GetComponent<Rigidbody>();
-            m_rb.freezeRotation = m_isRigRreezeRotation;
+            m_rb.freezeRotation = m_isRigFreezeRotation;
             IsEnable = true;
-            // 获取主相机的Transform组件
-            // if (cameraTransform == null)
-            //     cameraTransform = Camera.main.transform;
         }
 
         private void StopMove()
@@ -37,7 +34,7 @@ namespace UGU.Runtime
             m_rb.linearVelocity = new Vector3(0, m_rb.linearVelocity.y, 0);
         }
 
-        void Update()
+        private void Update()
         {
             if (!IsEnable)
             {

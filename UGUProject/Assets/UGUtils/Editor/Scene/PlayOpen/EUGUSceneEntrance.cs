@@ -1,8 +1,6 @@
-﻿using UGUE.Editor.Scene.Common;
-using UGUE.Editor.Scene.Const;
-using UnityEditor;
+﻿using UnityEditor;
 
-namespace UGUE.Editor.Scene.PlayOpen
+namespace UGU.Editor
 {
     public class EUGUSceneEntrance
     {

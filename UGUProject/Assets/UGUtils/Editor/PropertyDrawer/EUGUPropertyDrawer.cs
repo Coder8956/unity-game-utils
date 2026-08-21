@@ -1,12 +1,15 @@
 using UnityEditor;
 using UnityEngine;
+using UGU.Runtime;
 
-namespace UGUE.Editor.UGUProperty
+namespace UGU.Editor
 {
-    [CustomPropertyDrawer(typeof(UGU.Runtime.UGUPropertyBase), true)]
+    [CustomPropertyDrawer(typeof(UGUPropertyBase), true)]
     public class EUGUPropertyDrawer : PropertyDrawer
     {
         private const string ValueFieldName = "m_value";
+
+        // ── 公共入口 ──────────────────────────────────────────────
 
         public override void OnGUI(
             Rect position,

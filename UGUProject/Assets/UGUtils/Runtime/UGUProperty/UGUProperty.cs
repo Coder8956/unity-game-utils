@@ -14,7 +14,7 @@ namespace UGU.Runtime
 
     /// <summary>
     /// 数据绑定属性
-    /// 
+    ///
     /// 支持:
     /// 1. 数据存储
     /// 2. 数据修改过滤
@@ -37,12 +37,10 @@ namespace UGU.Runtime
         [SerializeField] private T m_value;
 
         // 只关心当前值
-        [NonSerialized] private readonly List<Action<T>> m_valueSubscribers
-            = new();
+        [NonSerialized] private readonly List<Action<T>> m_valueSubscribers = new();
 
         // 关心变化前后
-        [NonSerialized] private readonly List<Action<T, T>> m_changedSubscribers
-            = new();
+        [NonSerialized] private readonly List<Action<T, T>> m_changedSubscribers = new();
 
         /// <summary>
         /// 数据修改处理
@@ -70,24 +68,18 @@ namespace UGU.Runtime
                 // 数据处理
                 if (ValueProcessor != null)
                 {
-                    newValue =
-                        ValueProcessor.Invoke(value);
+                    newValue = ValueProcessor.Invoke(value);
                 }
 
                 // 数据未变化
-                if (EqualityComparer<T>.Default.Equals(
-                    m_value,
-                    newValue))
+                if (EqualityComparer<T>.Default.Equals(m_value, newValue))
                 {
                     return;
                 }
 
                 T oldValue = m_value;
                 m_value = newValue;
-                Notify(
-                    oldValue,
-                    newValue
-                );
+                Notify(oldValue, newValue);
             }
         }
 
@@ -96,8 +88,7 @@ namespace UGU.Runtime
         /// 适合:
         /// UI刷新
         /// </summary>
-        public void Subscribe(
-            Action<T> subscriber, bool immediateUpdate = true)
+        public void Subscribe(Action<T> subscriber, bool immediateUpdate = true)
         {
             if (subscriber == null)
                 return;
@@ -119,8 +110,7 @@ namespace UGU.Runtime
         /// 适合:
         /// 逻辑处理
         /// </summary>
-        public void SubscribeChanged(
-            Action<T, T> subscriber, bool immediateUpdate = true)
+        public void SubscribeChanged(Action<T, T> subscriber, bool immediateUpdate = true)
         {
             if (subscriber == null)
                 return;
@@ -133,18 +123,14 @@ namespace UGU.Runtime
             if (immediateUpdate)
             {
                 // 初次绑定
-                subscriber.Invoke(
-                    m_value,
-                    m_value
-                );
+                subscriber.Invoke(m_value, m_value);
             }
         }
 
         /// <summary>
         /// 移除最新值监听
         /// </summary>
-        public void Unsubscribe(
-            Action<T> subscriber)
+        public void Unsubscribe(Action<T> subscriber)
         {
             if (subscriber == null)
                 return;
@@ -155,8 +141,7 @@ namespace UGU.Runtime
         /// <summary>
         /// 移除变化监听
         /// </summary>
-        public void UnsubscribeChanged(
-            Action<T, T> subscriber)
+        public void UnsubscribeChanged(Action<T, T> subscriber)
         {
             if (subscriber == null)
                 return;
@@ -164,9 +149,7 @@ namespace UGU.Runtime
             m_changedSubscribers.Remove(subscriber);
         }
 
-        private void Notify(
-            T oldValue,
-            T newValue)
+        private void Notify(T oldValue, T newValue)
         {
             // 最新值监听
             for (int i = m_valueSubscribers.Count - 1; i >= 0; i--)
@@ -177,10 +160,7 @@ namespace UGU.Runtime
             // 新旧值监听
             for (int i = m_changedSubscribers.Count - 1; i >= 0; i--)
             {
-                m_changedSubscribers[i]?.Invoke(
-                    oldValue,
-                    newValue
-                );
+                m_changedSubscribers[i]?.Invoke(oldValue, newValue);
             }
         }
 
@@ -197,8 +177,7 @@ namespace UGU.Runtime
         /// 修改数据但不触发通知
         /// 仍会经过 ValueProcessor 处理
         /// </summary>
-        public void SetValueWithoutNotify(
-            T value)
+        public void SetValueWithoutNotify(T value)
         {
             T newValue = value;
             if (ValueProcessor != null)

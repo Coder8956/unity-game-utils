@@ -5,12 +5,11 @@ namespace UGU.Runtime
     /// <summary>
     /// 输入工具
     /// </summary>
-    public static class UGUtilsInput
+    public static class UGUInputUtils
     {
         /// <summary>
         /// 判断鼠标是否在屏幕内
         /// </summary>
-        /// <param name="mousePosition">鼠标的屏幕坐标</param>
         /// <returns>是否在屏幕内</returns>
         public static bool IsMouseInScreen()
         {

@@ -5,7 +5,7 @@ namespace UGU.Runtime
     /// <summary>
     /// 向量工具
     /// </summary>
-    public static class UGUtilsAngleV3
+    public static class UGUAngleV3Utils
     {
         /// <summary>
         /// 计算两个向量之间的角度 (0 到 360 度)

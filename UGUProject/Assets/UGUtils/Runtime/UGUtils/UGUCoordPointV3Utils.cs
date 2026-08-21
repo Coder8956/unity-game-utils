@@ -5,7 +5,7 @@ namespace UGU.Runtime
     /// <summary>
     /// 3D坐标点工具
     /// </summary>
-    public static class UGUtilsCoordPointV3
+    public static class UGUCoordPointV3Utils
     {
         /// <summary>
         /// 获取鼠标点的世界位置

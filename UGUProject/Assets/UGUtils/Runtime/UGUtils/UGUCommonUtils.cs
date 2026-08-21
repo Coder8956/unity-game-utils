@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Reflection;
-using UnityEditor;
 using UnityEngine;
 
 namespace UGU.Runtime
 {
-    public static class UGUtilCommon
+    public static class UGUCommonUtils
     {
         /// <summary>
         /// 转换对象类型(class)
@@ -35,34 +34,43 @@ namespace UGU.Runtime
         /// <summary>
         /// 获取对象的非公共字段(变量)
         /// </summary>
-        /// <param name="type"></param>
-        /// <param name="methodName"></param>
+        /// <param name="type">对象类型</param>
+        /// <param name="fieldName">字段名</param>
         /// <returns></returns>
         public static FieldInfo GetObjectNoPublicField(Type type, string fieldName)
         {
             return type.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
         }
 
-
-        public static string floatToPCT(float val, int places = 0)
+        /// <summary>
+        /// 将浮点数转换为百分比字符串
+        /// </summary>
+        /// <param name="val">要格式化的值</param>
+        /// <param name="places">保留小数位数</param>
+        /// <returns>百分比字符串</returns>
+        public static string FloatToPct(float val, int places = 0)
         {
-            string format = string.Concat("{", $"0:P{places}", "}");
-            return string.Format(format, val); // "45.67%"
+            return val.ToString($"P{places}");
         }
 
+        /// <summary>
+        /// 退出应用
+        /// </summary>
         public static void Quit()
         {
-            // 在编辑器中停止播放模式
 #if UNITY_EDITOR
-            EditorApplication.isPlaying = false;
+            UnityEditor.EditorApplication.isPlaying = false;
 #else
-            UnityEngine.Application.Quit(); // 在独立平台退出应用
+            Application.Quit();
 #endif
         }
 
+        /// <summary>
+        /// 获取当前时间的 Unix 时间戳（秒）
+        /// </summary>
+        /// <returns>Unix 时间戳（秒）</returns>
         public static long UnixTimestampSeconds()
         {
-            // 获取当前时间的 Unix 时间戳（秒）
             return DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         }
     }

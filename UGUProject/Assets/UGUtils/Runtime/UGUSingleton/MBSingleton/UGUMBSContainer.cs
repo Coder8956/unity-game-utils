@@ -8,55 +8,64 @@ namespace UGU.Runtime
     /// <summary>
     /// UGU MonoBehaviour 单例容器(Container)
     /// </summary>
-    public class UGUMBSC : MonoBehaviour
+    public class UGUMBSContainer : MonoBehaviour
     {
-        private static UGUMBSC Inst = null;
-        private static MethodInfo OnCreateMBSingleton = null;
+        private Dictionary<Type, UGUMBSingletonBase> m_singletonDic = new();
 
-        public static T Create<T>() where T : BaseMBSingleton
+        private static UGUMBSContainer Instance;
+        private static MethodInfo OnCreateMBSingleton;
+
+        public static T Create<T>() where T : UGUMBSingletonBase
         {
-            if (Inst == null)
+            if (Instance == null)
             {
                 GameObject container = new GameObject("UGU-MBSC");
                 DontDestroyOnLoad(container);
-                Inst = container.AddComponent<UGUMBSC>();
+                Instance = container.AddComponent<UGUMBSContainer>();
             }
 
             if (OnCreateMBSingleton == null)
             {
-                OnCreateMBSingleton = UGUtilCommon.GetObjectNoPublicMethod(typeof(BaseMBSingleton), "OnCreate");
+                OnCreateMBSingleton = UGUCommonUtils.GetObjectNoPublicMethod(typeof(UGUMBSingletonBase), "OnCreate");
             }
 
             T singleton = null;
 
             Type sKey = typeof(T);
 
-            if (!Inst.m_singletonDic.ContainsKey(sKey))
+            if (!Instance.m_singletonDic.ContainsKey(sKey))
             {
                 GameObject newMBSGO = new GameObject(sKey.Name);
-                BaseMBSingleton newMBS = newMBSGO.AddComponent<T>();
-                newMBSGO.transform.SetParent(Inst.transform);
-                Inst.m_singletonDic.Add(sKey, newMBS);
+                UGUMBSingletonBase newMBS = newMBSGO.AddComponent<T>();
+                newMBSGO.transform.SetParent(Instance.transform);
+                Instance.m_singletonDic.Add(sKey, newMBS);
                 singleton = newMBS as T;
 
                 OnCreateMBSingleton?.Invoke(newMBS, null);
             }
-
-            return singleton as T;
-        }
-
-        public static T Get<T>() where T : BaseMBSingleton
-        {
-            Type sKey = typeof(T);
-            BaseMBSingleton MBS = null;
-            if (Inst.m_singletonDic.ContainsKey(sKey))
+            else
             {
-                MBS = Inst.m_singletonDic[sKey];
+                singleton = Instance.m_singletonDic[sKey] as T;
             }
 
-            return MBS as T;
+            return singleton;
         }
 
-        private Dictionary<Type, BaseMBSingleton> m_singletonDic = new();
+        public static T Get<T>() where T : UGUMBSingletonBase
+        {
+            if (Instance == null)
+            {
+                Debug.LogWarning("[UGUMBSContainer] Get — container not initialized. Call Create<T>() first.");
+                return null;
+            }
+
+            Type sKey = typeof(T);
+            if (Instance.m_singletonDic.TryGetValue(sKey, out UGUMBSingletonBase mbs))
+            {
+                return mbs as T;
+            }
+
+            return null;
+        }
     }
 }

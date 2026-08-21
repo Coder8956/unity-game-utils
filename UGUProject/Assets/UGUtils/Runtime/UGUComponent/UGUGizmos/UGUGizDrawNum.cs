@@ -1,13 +1,18 @@
-﻿using UnityEditor;
-using UnityEngine;
+﻿using UnityEngine;
 
-// 需要这个命名空间
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace UGU.Runtime
 {
     public class UGUGizDrawNum : MonoBehaviour
     {
         [SerializeField] private float m_pointRadius = 0.5f;
         [SerializeField] private int m_number = 0;
+        [SerializeField] private int m_fontSize = 20;
+        [SerializeField] private Color m_gizmoColor = Color.red;
+        [SerializeField] private Vector3 m_offset = new(0.5f, 0, 0);
 
         public int Number
         {
@@ -15,16 +20,9 @@ namespace UGU.Runtime
             set => m_number = value;
         }
 
-        [SerializeField] private int m_fontSize = 20;
-
-        [SerializeField] private Color m_gizmoColor = Color.red;
-
         public Color GizmoColor => m_gizmoColor;
 
-        // [SerializeField] private Color m_gizmoNumColor = Color.red;
-        [SerializeField] private Vector3 m_offset = new(0.5f, 0, 0);
-
-        void OnDrawGizmos()
+        private void OnDrawGizmos()
         {
             Gizmos.color = m_gizmoColor;
             Gizmos.DrawSphere(transform.position, m_pointRadius);

@@ -1,28 +1,12 @@
-﻿using UGUE.Editor.Scene.Common;
-using UGUE.Editor.Scene.Const;
-using UnityEditor;
+﻿using UnityEditor;
 
-namespace UGUE.Editor.Scene.PlayOpen
+namespace UGU.Editor
 {
-    public class EUGUSceneVillageCoope
+    public class EUGUSceneBuildLevel
     {
         private const string TitleName = "BuilLevel";
         private const string ScenePath = "Assets/Tmp/Scenes/BuildLevel.unity";
         private const string MenuOpenTitle = EUGUSceneConst.MenuTitleOpen + TitleName;
-
-        /// <summary>
-        /// 运行场景
-        /// </summary>
-        // [MenuItem(MenuPlayTitle, priority = UGUESceneConst.PlayTitlePriority)]
-        // private static void PlayScene()
-        // {
-        //     if (EditorApplication.isPlaying) return;
-        //
-        //     UGUESceneCommon.OpenScene(ScenePath);
-        //
-        //     if (!EditorApplication.isPlaying)
-        //         EditorApplication.isPlaying = true;
-        // }
 
         /// <summary>
         /// 打开场景

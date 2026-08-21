@@ -8,14 +8,12 @@ namespace UGU.Runtime
         private float m_duration;
         private float m_currentTime;
         private bool m_isRunning = false;
-
-        public bool IsRunning => m_isRunning;
-
         private bool m_isLoop;
         private bool m_isDestroyOnComplete;
-
         private Action m_onComplete;
         private Action<float> m_onUpdate;
+
+        public bool IsRunning => m_isRunning;
 
         /// <summary>
         /// 设置计时器
@@ -55,6 +53,8 @@ namespace UGU.Runtime
         /// </summary>
         public void DestroyTimer()
         {
+            m_onUpdate = null;
+            m_onComplete = null;
             Destroy(gameObject);
         }
 

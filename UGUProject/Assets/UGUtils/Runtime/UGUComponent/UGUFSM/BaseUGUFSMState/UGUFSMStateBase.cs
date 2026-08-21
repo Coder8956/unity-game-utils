@@ -1,10 +1,10 @@
 ﻿namespace UGU.Runtime
 {
-    public class BaseUGUFSMState
+    public class UGUFSMStateBase
     {
         protected UGUFSM m_fsm;
 
-        public BaseUGUFSMState(UGUFSM fsm)
+        public UGUFSMStateBase(UGUFSM fsm)
         {
             m_fsm = fsm;
         }
