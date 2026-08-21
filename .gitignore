@@ -6,3 +6,7 @@ TFGUtilsProject/Logs/
 TFGUtilsProject/.vsconfig
 *.slnx
 *.csproj
+*.sln
+UGUProject/Library/
+UGUProject/Logs/
+UGUProject/Temp/
