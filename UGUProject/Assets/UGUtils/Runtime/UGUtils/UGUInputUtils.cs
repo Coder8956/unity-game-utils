@@ -15,12 +15,24 @@ namespace UGU.Runtime
         {
             Vector3 mousePosition = Input.mousePosition;
 
-            // 检查鼠标的 x 和 y 坐标是否在屏幕范围内
             bool isXInScreen = mousePosition.x >= 0 && mousePosition.x <= Screen.width;
             bool isYInScreen = mousePosition.y >= 0 && mousePosition.y <= Screen.height;
 
-            // 如果 x 和 y 都在屏幕范围内，则鼠标在屏幕内
             return isXInScreen && isYInScreen;
+        }
+
+        /// <summary>
+        /// 获取鼠标点的世界位置
+        /// </summary>
+        /// <param name="referenceCamera">参考相机</param>
+        /// <param name="mouseZVal">鼠标点的深度，具体值根据你的场景而定</param>
+        /// <returns></returns>
+        public static Vector3 MousePointScreenToWorld(Camera referenceCamera, float mouseZVal)
+        {
+            Vector3 mousePosition = Input.mousePosition;
+            mousePosition.z = mouseZVal;
+            Vector3 worldPosition = referenceCamera.ScreenToWorldPoint(mousePosition);
+            return worldPosition;
         }
     }
 }

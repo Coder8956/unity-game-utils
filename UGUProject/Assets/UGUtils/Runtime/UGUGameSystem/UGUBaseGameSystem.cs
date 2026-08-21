@@ -4,7 +4,7 @@ namespace UGU.Runtime
 {
     /// <summary>
     /// 游戏系统基类
-    /// 只能通过 Create() 创建全局唯一实例。
+    /// 只能通过 UGUGameSystemUtils.Create() 创建全局唯一实例。
     /// </summary>
     [DisallowMultipleComponent]
     [AddComponentMenu("")]
@@ -14,12 +14,12 @@ namespace UGU.Runtime
         /// <summary>
         /// 是否正通过 Create() 创建
         /// </summary>
-        private static bool IsCreating;
+        internal static bool IsCreating;
 
         /// <summary>
         /// 全局实例
         /// </summary>
-        protected static T Instance { get; private set; }
+        protected internal static T Instance { get; internal set; }
 
         /// <summary>
         /// 实例是否存在
@@ -40,7 +40,7 @@ namespace UGU.Runtime
             if (!IsCreating)
             {
                 Debug.LogError(
-                    $"{typeof(T).Name} 必须通过 {typeof(T).Name}.Create() 创建。");
+                    $"{typeof(T).Name} 必须通过 UGUGameSystemUtils.Create<{typeof(T).Name}>() 创建。");
 
                 Destroy(gameObject);
                 return;
@@ -91,31 +91,5 @@ namespace UGU.Runtime
         /// 系统初始化
         /// </summary>
         protected abstract void OnInitialize();
-
-        /// <summary>
-        /// 创建系统
-        /// </summary>
-        public static T Create(GameObject parent = null)
-        {
-            if (Instance != null)
-                return Instance;
-
-            IsCreating = true;
-
-            var go = new GameObject(typeof(T).Name);
-
-            DontDestroyOnLoad(go);
-
-            Instance = go.AddComponent<T>();
-
-            if (parent != null)
-            {
-                Instance.transform.SetParent(parent.transform, false);
-            }
-
-            IsCreating = false;
-
-            return Instance;
-        }
     }
 }

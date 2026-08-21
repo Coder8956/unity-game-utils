@@ -3,23 +3,23 @@ using UnityEngine;
 
 namespace UGU.Editor
 {
-    public class EUGUGOUtils
+    public static class EUGUGOUtils
     {
         /// <summary>
         /// 清理子物体
         /// </summary>
         /// <param name="go"></param>
-        public static void ClearSubGO(GameObject go)
+        public static void ClearChildGO(GameObject go)
         {
-            List<GameObject> subObjects = new List<GameObject>();
+            List<GameObject> childObjects = new List<GameObject>();
             foreach (Transform t in go.transform)
             {
-                subObjects.Add(t.gameObject);
+                childObjects.Add(t.gameObject);
             }
 
-            foreach (var subGO in subObjects)
+            foreach (var childGO in childObjects)
             {
-                GameObject.DestroyImmediate(subGO);
+                Object.DestroyImmediate(childGO);
             }
         }
     }
