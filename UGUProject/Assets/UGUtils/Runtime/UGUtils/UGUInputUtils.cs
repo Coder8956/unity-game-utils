@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace UGU.Runtime
 {
@@ -13,7 +14,9 @@ namespace UGU.Runtime
         /// <returns>是否在屏幕内</returns>
         public static bool IsMouseInScreen()
         {
-            Vector3 mousePosition = Input.mousePosition;
+            if (Mouse.current == null) return false;
+
+            Vector2 mousePosition = Mouse.current.position.ReadValue();
 
             bool isXInScreen = mousePosition.x >= 0 && mousePosition.x <= Screen.width;
             bool isYInScreen = mousePosition.y >= 0 && mousePosition.y <= Screen.height;
@@ -29,7 +32,9 @@ namespace UGU.Runtime
         /// <returns></returns>
         public static Vector3 MousePointScreenToWorld(Camera referenceCamera, float mouseZVal)
         {
-            Vector3 mousePosition = Input.mousePosition;
+            if (Mouse.current == null) return Vector3.zero;
+
+            Vector3 mousePosition = Mouse.current.position.ReadValue();
             mousePosition.z = mouseZVal;
             Vector3 worldPosition = referenceCamera.ScreenToWorldPoint(mousePosition);
             return worldPosition;

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace UGU.Runtime
 {
@@ -43,8 +44,17 @@ namespace UGU.Runtime
             }
 
             // 获取输入
-            float horizontal = Input.GetAxis("Horizontal");
-            float vertical = Input.GetAxis("Vertical");
+            float horizontal = 0f;
+            float vertical = 0f;
+
+            var keyboard = Keyboard.current;
+            if (keyboard != null)
+            {
+                horizontal = (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed ? 1f : 0f)
+                           - (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed ? 1f : 0f);
+                vertical = (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed ? 1f : 0f)
+                         - (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed ? 1f : 0f);
+            }
 
             // 计算移动方向
             Vector3 moveDirection = new Vector3(horizontal, 0, vertical).normalized;

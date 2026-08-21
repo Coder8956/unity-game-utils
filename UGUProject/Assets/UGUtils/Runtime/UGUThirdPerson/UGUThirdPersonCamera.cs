@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace UGU.Runtime
 {
@@ -6,10 +7,10 @@ namespace UGU.Runtime
     {
         #region Inspector Properties
 
-        [SerializeField] private string m_rotateCameraXInput = "Mouse X";
-        [SerializeField] private string m_rotateCameraYInput = "Mouse Y";
-
         [SerializeField] private Transform m_target;
+
+        [Tooltip("鼠标移动缩放系数，用于将原始像素增量转换为旋转量")]
+        [SerializeField] private float m_mouseDeltaScale = 0.1f;
 
         [Tooltip("Lerp speed between Camera States")]
         [SerializeField] private float m_smoothCameraRotation = 12f;
@@ -119,12 +120,13 @@ namespace UGU.Runtime
 
         protected virtual void CameraInput()
         {
-            if (Input.GetMouseButton(1))
-            {
-                var y = Input.GetAxis(m_rotateCameraYInput);
-                var x = Input.GetAxis(m_rotateCameraXInput);
+            if (Mouse.current == null) return;
 
-                RotateCamera(x, y);
+            if (Mouse.current.rightButton.isPressed)
+            {
+                var delta = Mouse.current.delta.ReadValue() * m_mouseDeltaScale;
+
+                RotateCamera(delta.x, delta.y);
             }
         }
 
@@ -161,7 +163,11 @@ namespace UGU.Runtime
             if (currentTarget == null)
                 return;
 
-            float scroll = Input.GetAxis("Mouse ScrollWheel");
+            float scroll = 0f;
+            if (Mouse.current != null)
+            {
+                scroll = Mouse.current.scroll.y.ReadValue() / 120f;
+            }
 
             if (scroll != 0f)
             {
