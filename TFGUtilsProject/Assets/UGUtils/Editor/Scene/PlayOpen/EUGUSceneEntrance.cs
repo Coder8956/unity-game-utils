@@ -7,7 +7,7 @@ namespace UGUE.Editor.Scene.PlayOpen
     public class EUGUSceneEntrance
     {
         private const string TitleName = "Launch";
-        private const string ScenePath = "Assets/Game/Scenes/Launch.unity";
+        private const string ScenePath = "Assets/DPGame/Scenes/Launch.scene";
         private const string MenuPlayTitle = EUGUSceneConst.MenuTitlePlay + TitleName;
         private const string MenuOpenTitle = EUGUSceneConst.MenuTitleOpen + TitleName;
 

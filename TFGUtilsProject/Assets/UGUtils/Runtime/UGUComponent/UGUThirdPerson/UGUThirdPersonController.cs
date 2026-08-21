@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace UGU.Runtime.UGUComponent
+namespace UGU.Runtime
 {
     [RequireComponent(typeof(Rigidbody))]
     public class UGUThirdPersonController : MonoBehaviour

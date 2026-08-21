@@ -1,4 +1,4 @@
-﻿namespace UGU.Runtime.UGUComponent
+﻿namespace UGU.Runtime
 {
     public class BaseUGUFSMState
     {

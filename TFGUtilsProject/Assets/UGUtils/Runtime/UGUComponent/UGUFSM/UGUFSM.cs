@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace UGU.Runtime.UGUComponent
+namespace UGU.Runtime
 {
     public class UGUFSM : MonoBehaviour
     {

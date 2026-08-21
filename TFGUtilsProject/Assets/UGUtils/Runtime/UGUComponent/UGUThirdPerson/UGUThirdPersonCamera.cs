@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace UGU.Runtime.UGUComponent
+namespace UGU.Runtime
 {
     public class UGUThirdPersonCamera : MonoBehaviour
     {

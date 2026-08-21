@@ -3,7 +3,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace UGU.Runtime.Utils
+namespace UGU.Runtime
 {
     public static class UGUtilCommon
     {

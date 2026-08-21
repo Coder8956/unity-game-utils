@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace UGU.Runtime.Utils
+namespace UGU.Runtime
 {
     /// <summary>
     /// 输入工具

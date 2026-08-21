@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace UGU.Runtime.UGUComponent.UGUGizmos
+namespace UGU.Runtime
 {
     public class UGUGizDrawGOBox : MonoBehaviour
     {

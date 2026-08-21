@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace UGU.Runtime.Utils
+namespace UGU.Runtime
 {
     /// <summary>
     /// 3D坐标点工具

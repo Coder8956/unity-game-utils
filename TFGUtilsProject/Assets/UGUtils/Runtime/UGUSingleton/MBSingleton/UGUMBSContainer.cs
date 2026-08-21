@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using UGU.Runtime.Utils;
 using UnityEngine;
 
-namespace UGU.Runtime.UGUSingleton.MBSingleton
+namespace UGU.Runtime
 {
     /// <summary>
     /// UGU MonoBehaviour 单例容器(Container)

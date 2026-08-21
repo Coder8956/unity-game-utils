@@ -1,0 +1,128 @@
+﻿using UnityEngine;
+
+namespace UGU.Runtime
+{
+    /// <summary>
+    /// 游戏系统基类
+    /// 只能通过 Create() 创建全局唯一实例。
+    /// </summary>
+    [DisallowMultipleComponent]
+    [AddComponentMenu("")]
+    public abstract class UGUBaseGameSystem<T> : MonoBehaviour
+        where T : UGUBaseGameSystem<T>
+    {
+        /// <summary>
+        /// 全局实例
+        /// </summary>
+        private static T s_instance;
+
+        /// <summary>
+        /// 是否正通过 Create() 创建
+        /// </summary>
+        private static bool s_isCreating;
+
+        /// <summary>
+        /// 全局实例
+        /// </summary>
+        protected static T Instance => s_instance;
+
+        /// <summary>
+        /// 实例是否存在
+        /// </summary>
+        public static bool HasInstance => s_instance != null;
+
+        /// <summary>
+        /// 是否已初始化
+        /// </summary>
+        public bool Initialized { get; private set; }
+
+        /// <summary>
+        /// 创建系统
+        /// </summary>
+        public static T Create(GameObject parent = null)
+        {
+            if (s_instance != null)
+                return s_instance;
+
+            s_isCreating = true;
+
+            var go = new GameObject(typeof(T).Name);
+
+            DontDestroyOnLoad(go);
+
+            s_instance = go.AddComponent<T>();
+
+            if (parent != null)
+            {
+                s_instance.transform.SetParent(parent.transform, false);
+            }
+
+            s_isCreating = false;
+
+            return s_instance;
+        }
+
+        /// <summary>
+        /// Unity Awake
+        /// </summary>
+        protected virtual void Awake()
+        {
+            // 必须通过 Create() 创建
+            if (!s_isCreating)
+            {
+                Debug.LogError(
+                    $"{typeof(T).Name} 必须通过 {typeof(T).Name}.Create() 创建。");
+
+                Destroy(gameObject);
+                return;
+            }
+
+            // 防止重复实例
+            if (s_instance != null && s_instance != this)
+            {
+                Debug.LogError(
+                    $"{typeof(T).Name} 只能存在一个实例。");
+
+                Destroy(gameObject);
+                return;
+            }
+
+            s_instance = (T) this;
+
+            gameObject.name = typeof(T).Name;
+
+            DontDestroyOnLoad(gameObject);
+
+            InitializeInternal();
+        }
+
+        /// <summary>
+        /// Unity OnDestroy
+        /// </summary>
+        protected virtual void OnDestroy()
+        {
+            if (s_instance == this)
+            {
+                s_instance = null;
+            }
+        }
+
+        /// <summary>
+        /// 内部初始化
+        /// </summary>
+        private void InitializeInternal()
+        {
+            if (Initialized)
+                return;
+
+            Initialized = true;
+
+            OnInitialize();
+        }
+
+        /// <summary>
+        /// 系统初始化
+        /// </summary>
+        protected abstract void OnInitialize();
+    }
+}

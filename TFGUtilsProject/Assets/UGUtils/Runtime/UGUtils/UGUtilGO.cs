@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UGU.Runtime.Utils
+namespace UGU.Runtime
 {
     public class UGUtilGO
     {

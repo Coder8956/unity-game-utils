@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace UGU.Runtime.UGUSingleton.MBSingleton
+namespace UGU.Runtime
 {
     public abstract class BaseMBSingleton : MonoBehaviour
     {
