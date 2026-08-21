@@ -10,3 +10,7 @@ TFGUtilsProject/.vsconfig
 UGUProject/Library/
 UGUProject/Logs/
 UGUProject/Temp/
+UGUProject/.com-unity-codely.json
+UGUProject/.codelyignore
+UGUProject/.codely.packages/
+UGUProject/.codely-cli/
