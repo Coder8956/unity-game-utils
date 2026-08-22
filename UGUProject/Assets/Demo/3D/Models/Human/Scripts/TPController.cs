@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UGU.Runtime;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
@@ -12,7 +13,7 @@ public class TPController : TPAnimator
     // ── 运行时状态 ──────────────────────────────────────────
 
     /// <summary>场景中的第三人称相机</summary>
-    public TPCamera TpCamera { get; private set; }
+    public UGUTPCamera TpCamera { get; private set; }
     /// <summary>主相机</summary>
     public Camera CameraMain { get; private set; }
 
@@ -55,7 +56,7 @@ public class TPController : TPAnimator
     {
         if (TpCamera == null)
         {
-            TpCamera = FindFirstObjectByType<TPCamera>();
+            TpCamera = FindFirstObjectByType<UGUTPCamera>();
             if (TpCamera == null)
                 return;
             TpCamera.SetMainTarget(this.transform);

@@ -205,7 +205,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!81 &330585544
 AudioListener:
   m_ObjectHideFlags: 0
@@ -274,7 +274,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalPosition: {x: 0, y: 1.4, z: -2.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -333,34 +333,31 @@ MonoBehaviour:
   m_GameObject: {fileID: 330585543}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 887aba9acb5c9644a87cebb768cc8c13, type: 3}
+  m_Script: {fileID: 11500000, guid: 1a1bfe72fbc87d04e885296b53e91c66, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UGUtils.Runtime::UGU.Runtime.UGUThirdPersonCamera
-  m_target: {fileID: 0}
-  m_mouseDeltaScale: 0.1
+  m_EditorClassIdentifier: UGUtils.Runtime::UGU.Runtime.UGUTPCamera
+  m_target: {fileID: 10915158}
+  m_rightOffset: 0
+  m_defaultDistance: 2.5
+  m_height: 1.4
   m_smoothCameraRotation: 12
+  m_smoothFollow: 10
+  m_enableZoom: 1
+  m_zoomSensitivity: 0.01
+  m_minDistance: 1
+  m_maxDistance: 10
+  m_rotationMode: 0
+  m_xMouseSensitivity: 3
+  m_yMouseSensitivity: 3
+  m_mouseDeltaScale: 0.1
+  m_yMinLimit: -40
+  m_yMaxLimit: 80
+  m_enableCulling: 1
   m_cullingLayer:
     serializedVersion: 2
     m_Bits: 1
-  m_lockCamera: 0
-  m_rightOffset: 0
-  m_defaultDistance: 5
-  m_followDistanceMax: 60
-  m_followDistanceMin: 1
-  m_mouseScrollSpeed: 10
-  m_height: 1.4
-  m_smoothFollow: 10
-  m_xMouseSensitivity: 3
-  m_yMouseSensitivity: 3
-  m_yMinLimit: -40
-  m_yMaxLimit: 80
-  m_checkBlockedCulling: 1
-  indexList: 0
-  indexLookPoint: 0
-  offSetPlayerPivot: 0
-  currentStateName: 
-  currentTarget: {fileID: 0}
-  movementSpeed: {x: 0, y: 0}
+  m_lockOnRun: 0
+  m_previewInEditor: 0
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -537,67 +534,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1100040847
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 2700874171910072504, guid: f63ff34a1c1f60146994d521491416f9, type: 3}
-      propertyPath: m_Name
-      value: TPCamera
-      objectReference: {fileID: 0}
-    - target: {fileID: 2700874171910072505, guid: f63ff34a1c1f60146994d521491416f9, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2700874171910072505, guid: f63ff34a1c1f60146994d521491416f9, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 1.44
-      objectReference: {fileID: 0}
-    - target: {fileID: 2700874171910072505, guid: f63ff34a1c1f60146994d521491416f9, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -1.23
-      objectReference: {fileID: 0}
-    - target: {fileID: 2700874171910072505, guid: f63ff34a1c1f60146994d521491416f9, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2700874171910072505, guid: f63ff34a1c1f60146994d521491416f9, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2700874171910072505, guid: f63ff34a1c1f60146994d521491416f9, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2700874171910072505, guid: f63ff34a1c1f60146994d521491416f9, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2700874171910072505, guid: f63ff34a1c1f60146994d521491416f9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2700874171910072505, guid: f63ff34a1c1f60146994d521491416f9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2700874171910072505, guid: f63ff34a1c1f60146994d521491416f9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2700874171910072507, guid: f63ff34a1c1f60146994d521491416f9, type: 3}
-      propertyPath: m_target
-      value: 
-      objectReference: {fileID: 10915158}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: f63ff34a1c1f60146994d521491416f9, type: 3}
 --- !u!1001 &1490340612
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -663,5 +599,4 @@ SceneRoots:
   - {fileID: 410087041}
   - {fileID: 832575519}
   - {fileID: 111922334}
-  - {fileID: 1100040847}
   - {fileID: 1490340612}

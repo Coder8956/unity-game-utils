@@ -352,10 +352,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 330585546}
+  - component: {fileID: 330585548}
   - component: {fileID: 330585545}
   - component: {fileID: 330585544}
   - component: {fileID: 330585547}
-  - component: {fileID: 330585548}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -494,20 +494,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TPCamera
   m_target: {fileID: 51578224}
-  m_smoothCameraRotation: 100
-  m_cullingLayer:
-    serializedVersion: 2
-    m_Bits: 1
-  m_lockCamera: 0
   m_rightOffset: 0
   m_defaultDistance: 2.5
   m_height: 1.4
+  m_smoothCameraRotation: 100
   m_smoothFollow: 10
+  m_enableZoom: 1
+  m_zoomSensitivity: 1
+  m_minDistance: 1
+  m_maxDistance: 10
+  m_rotationMode: 1
   m_xMouseSensitivity: 3
   m_yMouseSensitivity: 3
+  m_mouseDeltaScale: 0.1
   m_yMinLimit: -40
   m_yMaxLimit: 80
-  m_mouseDeltaScale: 0.1
+  m_enableCulling: 1
+  m_cullingLayer:
+    serializedVersion: 2
+    m_Bits: 1
+  m_lockOnRun: 0
   m_previewInEditor: 0
 --- !u!1 &410087039
 GameObject:
