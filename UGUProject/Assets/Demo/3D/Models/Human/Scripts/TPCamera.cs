@@ -6,22 +6,16 @@ using UnityEngine.InputSystem;
 /// 负责相机的跟随、旋转、碰撞避让（裁剪）等逻辑，
 /// 使相机始终以目标角色为中心进行平滑环绕拍摄。
 /// </summary>
+[ExecuteAlways]
 public class TPCamera : MonoBehaviour
 {
     // ── Inspector 配置 ────────────────────────────────────────
 
+    [Header("Target")]
     [Tooltip("相机跟随的目标变换（通常是角色根节点）")]
     [SerializeField] private Transform m_target;
 
-    [Tooltip("相机状态之间的旋转插值速度，值越大旋转越快")]
-    [SerializeField] private float m_smoothCameraRotation = 12f;
-
-    [Tooltip("相机裁剪检测层，这些层上的物体将触发碰撞避让")]
-    [SerializeField] private LayerMask m_cullingLayer = 1 << 0;
-
-    [Tooltip("调试用：锁定相机在角色正后方，便于对齐相机状态")]
-    [SerializeField] private bool m_lockCamera;
-
+    [Header("Position")]
     [Tooltip("相机相对于目标右侧的偏移量")]
     [SerializeField] private float m_rightOffset = 0f;
 
@@ -31,14 +25,35 @@ public class TPCamera : MonoBehaviour
     [Tooltip("相机相对于目标的高度偏移")]
     [SerializeField] private float m_height = 1.4f;
 
+    [Header("Smoothing")]
+    [Tooltip("相机状态之间的旋转插值速度，值越大旋转越快")]
+    [SerializeField] private float m_smoothCameraRotation = 12f;
+
     [Tooltip("相机位置跟随目标的平滑速度")]
     [SerializeField] private float m_smoothFollow = 10f;
 
+    [Header("Zoom")]
+    [Tooltip("是否启用鼠标滚轮缩放相机距离")]
+    [SerializeField] private bool m_enableZoom = true;
+
+    [Tooltip("滚轮缩放灵敏度")]
+    [SerializeField] private float m_zoomSensitivity = 0.01f;
+
+    [Tooltip("相机距离的最小值")]
+    [SerializeField] private float m_minDistance = 1f;
+
+    [Tooltip("相机距离的最大值")]
+    [SerializeField] private float m_maxDistance = 10f;
+
+    [Header("Rotation Input")]
     [Tooltip("鼠标 X 轴（水平）旋转灵敏度")]
     [SerializeField] private float m_xMouseSensitivity = 3f;
 
     [Tooltip("鼠标 Y 轴（垂直）旋转灵敏度")]
     [SerializeField] private float m_yMouseSensitivity = 3f;
+
+    [Tooltip("鼠标移动缩放系数，用于将原始像素增量转换为旋转量")]
+    [SerializeField] private float m_mouseDeltaScale = 0.1f;
 
     [Tooltip("垂直方向最小俯角限制（度）")]
     [SerializeField] private float m_yMinLimit = -40f;
@@ -46,9 +61,16 @@ public class TPCamera : MonoBehaviour
     [Tooltip("垂直方向最大仰角限制（度）")]
     [SerializeField] private float m_yMaxLimit = 80f;
 
-    [Header("Mouse Input")]
-    [Tooltip("鼠标移动缩放系数，用于将原始像素增量转换为旋转量")]
-    [SerializeField] private float m_mouseDeltaScale = 0.1f;
+    [Header("Collision")]
+    [Tooltip("相机裁剪检测层，这些层上的物体将触发碰撞避让")]
+    [SerializeField] private LayerMask m_cullingLayer = 1 << 0;
+
+    [Header("Debug")]
+    [Tooltip("调试用：锁定相机在角色正后方，便于对齐相机状态")]
+    [SerializeField] private bool m_lockCamera;
+
+    [Tooltip("勾选后在编辑器模式下实时预览相机初始位置与朝向（无需进入 Play Mode）")]
+    [SerializeField] private bool m_previewInEditor;
 
     // ── 公共属性（运行时状态，外部只读） ─────────────
 
@@ -99,20 +121,39 @@ public class TPCamera : MonoBehaviour
 
     private void Start()
     {
+        if (!Application.isPlaying) return;
         Init();
     }
 
     private void Update()
     {
-        var mouse = Mouse.current;
-        if (mouse == null) return;
+        if (Application.isPlaying)
+        {
+            var mouse = Mouse.current;
+            if (mouse == null) return;
 
-        var delta = mouse.delta.ReadValue() * m_mouseDeltaScale;
-        RotateCamera(delta.x, delta.y);
+            var delta = mouse.delta.ReadValue() * m_mouseDeltaScale;
+            RotateCamera(delta.x, delta.y);
+
+            // 鼠标滚轮缩放相机距离
+            if (m_enableZoom)
+            {
+                var scroll = mouse.scroll.ReadValue().y;
+                if (!Mathf.Approximately(scroll, 0f))
+                {
+                    m_defaultDistance = Mathf.Clamp(m_defaultDistance - scroll * m_zoomSensitivity, m_minDistance, m_maxDistance);
+                }
+            }
+        }
+        else if (m_previewInEditor)
+        {
+            PreviewInitialPosition();
+        }
     }
 
     private void FixedUpdate()
     {
+        if (!Application.isPlaying) return;
         if (m_target == null || m_targetLookAt == null) return;
 
         CameraMovement();
@@ -142,6 +183,7 @@ public class TPCamera : MonoBehaviour
         m_mouseY = CurrentTarget.eulerAngles.x;
         m_mouseX = CurrentTarget.eulerAngles.y;
 
+        m_defaultDistance = Mathf.Clamp(m_defaultDistance, m_minDistance, m_maxDistance);
         m_distance = m_defaultDistance;
         m_currentHeight = m_height;
     }
@@ -208,6 +250,38 @@ public class TPCamera : MonoBehaviour
     }
 
     // ── 相机逻辑 ─────────────────────────────────────────────
+
+    /// <summary>
+    /// 编辑器预览：根据当前 Inspector 配置直接计算并应用相机初始位置与朝向。
+    /// 不依赖运行时状态（虚拟注视点、Time.deltaTime 等），
+    /// 仅使用目标朝向、距离、高度等参数做一次性定位。
+    /// </summary>
+    private void PreviewInitialPosition()
+    {
+        if (m_target == null) return;
+
+        if (m_camera == null)
+            m_camera = GetComponent<Camera>();
+        if (m_camera == null) return;
+
+        // 初始角度取自目标朝向
+        var mouseY = m_target.eulerAngles.x;
+        var mouseX = m_target.eulerAngles.y;
+
+        // 计算相机方向：后向 + 右侧偏移（与运行时 CameraMovement 一致）
+        var rotation = Quaternion.Euler(mouseY, mouseX, 0);
+        var camDir = ((-1f) * (rotation * Vector3.forward) + m_rightOffset * (rotation * Vector3.right)).normalized;
+
+        // 目标位置 + 高度偏移
+        var targetPos = m_target.position;
+        var cameraPos = targetPos + new Vector3(0, m_height, 0) + camDir * m_defaultDistance;
+
+        transform.position = cameraPos;
+
+        // 相机朝向目标点（含高度偏移）
+        var lookPoint = targetPos + new Vector3(0, m_height, 0);
+        transform.rotation = Quaternion.LookRotation(lookPoint - cameraPos);
+    }
 
     /// <summary>
     /// 相机移动核心逻辑：
