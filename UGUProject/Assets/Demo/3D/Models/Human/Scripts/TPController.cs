@@ -1,0 +1,184 @@
+﻿using UnityEngine;
+
+/// <summary>
+/// 第三人称控制器。
+/// 继承自 TPAnimator，负责根位移控制、移动类型切换、
+/// 旋转控制、冲刺/瞄准/跳跃等动作输入的处理。
+/// </summary>
+public class TPController : TPAnimator
+{
+    // ── 根位移控制 ────────────────────────────────────────────
+
+    /// <summary>
+    /// 控制动画根位移的应用：
+    /// - 无输入时直接使用动画的根位置和根旋转；
+    /// - 启用根位移时通过 MoveCharacter 应用额外移动方向。
+    /// </summary>
+    public virtual void ControlAnimatorRootMotion()
+    {
+        if (!this.enabled) return;
+
+        // 无输入时直接同步动画根位移结果
+        if (m_inputSmooth == Vector3.zero)
+        {
+            transform.position = m_animator.rootPosition;
+            transform.rotation = m_animator.rootRotation;
+        }
+
+        // 启用根位移时叠加移动方向
+        if (m_useRootMotion)
+            MoveCharacter(m_moveDirection);
+    }
+
+    // ── 移动类型控制 ──────────────────────────────────────────
+
+    /// <summary>
+    /// 根据移动类型（自由/瞄准/混合）设置移动速度和动画速度。
+    /// 非根位移模式下直接驱动角色移动。
+    /// </summary>
+    public virtual void ControlLocomotionType()
+    {
+        if (m_lockMovement) return;
+
+        // 自由移动模式：使用自由速度
+        if (m_locomotionType.Equals(LocomotionType.FreeWithStrafe) && !IsStrafing || m_locomotionType.Equals(LocomotionType.OnlyFree))
+        {
+            SetControllerMoveSpeed(m_freeSpeed);
+            SetAnimatorMoveSpeed(m_freeSpeed);
+        }
+        // 瞄准移动模式：使用瞄准速度
+        else if (m_locomotionType.Equals(LocomotionType.OnlyStrafe) || m_locomotionType.Equals(LocomotionType.FreeWithStrafe) && IsStrafing)
+        {
+            IsStrafing = true;
+            SetControllerMoveSpeed(m_strafeSpeed);
+            SetAnimatorMoveSpeed(m_strafeSpeed);
+        }
+
+        // 非根位移模式直接驱动刚体移动
+        if (!m_useRootMotion)
+            MoveCharacter(m_moveDirection);
+    }
+
+    // ── 旋转控制 ──────────────────────────────────────────────
+
+    /// <summary>
+    /// 控制角色旋转：
+    /// 根据是否有输入或是否跟随相机旋转来决定旋转方向，
+    /// 平滑插值输入向量后旋转角色。
+    /// </summary>
+    public virtual void ControlRotationType()
+    {
+        if (m_lockRotation) return;
+
+        // 判定是否需要旋转：有输入 或 配置了静止时跟随相机
+        bool validInput = Input != Vector3.zero || (IsStrafing ? m_strafeSpeed.rotateWithCamera : m_freeSpeed.rotateWithCamera);
+
+        if (validInput)
+        {
+            // 平滑输入向量
+            m_inputSmooth = Vector3.Lerp(m_inputSmooth, Input, (IsStrafing ? m_strafeSpeed.movementSmooth : m_freeSpeed.movementSmooth) * Time.deltaTime);
+
+            // 确定旋转方向：
+            // - 瞄准模式（非冲刺或允许瞄准冲刺）或静止且配置跟随相机 → 朝相机方向
+            // - 否则 → 朝移动方向
+            Vector3 dir = (IsStrafing && (!IsSprinting || m_sprintOnlyFree == false) || (m_freeSpeed.rotateWithCamera && Input == Vector3.zero)) && RotateTarget ? RotateTarget.forward : m_moveDirection;
+            RotateToDirection(dir);
+        }
+    }
+
+    /// <summary>
+    /// 更新移动方向向量。
+    /// 有参考变换（相机）时基于相机朝向计算本地方向；否则使用世界方向。
+    /// 无输入时平滑回零。
+    /// </summary>
+    /// <param name="referenceTransform">参考变换（通常为主相机）</param>
+    public virtual void UpdateMoveDirection(Transform referenceTransform = null)
+    {
+        // 无输入时平滑归零
+        if (Input.magnitude <= 0.01)
+        {
+            m_moveDirection = Vector3.Lerp(m_moveDirection, Vector3.zero, (IsStrafing ? m_strafeSpeed.movementSmooth : m_freeSpeed.movementSmooth) * Time.deltaTime);
+            return;
+        }
+
+        if (referenceTransform && !m_rotateByWorld)
+        {
+            // 基于相机朝向计算移动方向（相机右方 = 角色右方，相机右方旋转 -90° = 角色前方）
+            var right = referenceTransform.right;
+            right.y = 0;
+            var forward = Quaternion.AngleAxis(-90, Vector3.up) * right;
+            m_moveDirection = (m_inputSmooth.x * right) + (m_inputSmooth.z * forward);
+        }
+        else
+        {
+            // 世界坐标方向
+            m_moveDirection = new Vector3(m_inputSmooth.x, 0, m_inputSmooth.z);
+        }
+    }
+
+    // ── 动作输入 ──────────────────────────────────────────────
+
+    /// <summary>
+    /// 冲刺切换逻辑：
+    /// - 持续冲刺模式下每次按下切换开关；
+    /// - 非持续模式下按下开启、松开关闭；
+    /// - 需满足冲刺条件（有输入、着地等）。
+    /// </summary>
+    /// <param name="value">true = 按下，false = 松开</param>
+    public virtual void Sprint(bool value)
+    {
+        // 冲刺条件：有输入、着地、且不处于瞄准行走中
+        var sprintConditions = (Input.sqrMagnitude > 0.1f && IsGrounded &&
+            !(IsStrafing && !m_strafeSpeed.walkByDefault && (m_horizontalSpeed >= 0.5 || m_horizontalSpeed <= -0.5 || m_verticalSpeed <= 0.1f)));
+
+        if (value && sprintConditions)
+        {
+            if (Input.sqrMagnitude > 0.1f)
+            {
+                if (IsGrounded && m_useContinuousSprint)
+                {
+                    // 持续冲刺：切换开关
+                    IsSprinting = !IsSprinting;
+                }
+                else if (!IsSprinting)
+                {
+                    // 非持续冲刺：按下即开
+                    IsSprinting = true;
+                }
+            }
+            else if (!m_useContinuousSprint && IsSprinting)
+            {
+                IsSprinting = false;
+            }
+        }
+        else if (IsSprinting)
+        {
+            // 不满足条件时关闭冲刺
+            IsSprinting = false;
+        }
+    }
+
+    /// <summary>
+    /// 切换瞄准/横移模式。
+    /// </summary>
+    public virtual void Strafe()
+    {
+        IsStrafing = !IsStrafing;
+    }
+
+    /// <summary>
+    /// 跳跃：设置跳跃计时器并播放跳跃动画。
+    /// 静止时播放原地跳跃，移动时播放移动跳跃。
+    /// </summary>
+    public virtual void Jump()
+    {
+        m_jumpCounter = m_jumpTimer;
+        IsJumping = true;
+
+        // 根据是否移动选择不同跳跃动画
+        if (Input.sqrMagnitude < 0.1f)
+            m_animator.CrossFadeInFixedTime("Jump", 0.1f);
+        else
+            m_animator.CrossFadeInFixedTime("JumpMove", .2f);
+    }
+}
