@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// 第三人称相机控制器。
@@ -44,6 +45,10 @@ public class TPCamera : MonoBehaviour
 
     [Tooltip("垂直方向最大仰角限制（度）")]
     [SerializeField] private float m_yMaxLimit = 80f;
+
+    [Header("Mouse Input")]
+    [Tooltip("鼠标移动缩放系数，用于将原始像素增量转换为旋转量")]
+    [SerializeField] private float m_mouseDeltaScale = 0.1f;
 
     // ── 公共属性（运行时状态，外部只读） ─────────────
 
@@ -95,6 +100,15 @@ public class TPCamera : MonoBehaviour
     private void Start()
     {
         Init();
+    }
+
+    private void Update()
+    {
+        var mouse = Mouse.current;
+        if (mouse == null) return;
+
+        var delta = mouse.delta.ReadValue() * m_mouseDeltaScale;
+        RotateCamera(delta.x, delta.y);
     }
 
     private void FixedUpdate()

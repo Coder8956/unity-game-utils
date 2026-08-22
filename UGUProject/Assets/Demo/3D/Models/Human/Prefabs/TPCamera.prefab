@@ -120,6 +120,7 @@ MonoBehaviour:
   m_yMouseSensitivity: 3
   m_yMinLimit: -40
   m_yMaxLimit: 80
+  m_mouseDeltaScale: 0.1
   indexList: 0
   indexLookPoint: 0
   offSetPlayerPivot: 0
