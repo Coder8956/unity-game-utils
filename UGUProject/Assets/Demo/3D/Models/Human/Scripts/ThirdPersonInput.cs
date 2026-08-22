@@ -1,21 +1,21 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Invector.vCharacterController
+namespace Invector.CharacterController
 {
-    public class vThirdPersonInput : MonoBehaviour
+    public class ThirdPersonInput : MonoBehaviour
     {
-        #region Variables       
+        // ── Inspector 配置 ────────────────────────────────────────
 
         [Header("Camera Input")]
         [Tooltip("鼠标移动缩放系数，用于将原始像素增量转换为旋转量")]
-        public float mouseDeltaScale = 0.1f;
+        [SerializeField] private float m_mouseDeltaScale = 0.1f;
 
-        [HideInInspector] public vThirdPersonController cc;
-        [HideInInspector] public vThirdPersonCamera tpCamera;
+        [HideInInspector] public ThirdPersonController cc;
+        [HideInInspector] public ThirdPersonCamera tpCamera;
         [HideInInspector] public Camera cameraMain;
 
-        #endregion
+        // ── 生命周期 ─────────────────────────────────────────────
 
         protected virtual void Start()
         {
@@ -25,27 +25,27 @@ namespace Invector.vCharacterController
 
         protected virtual void FixedUpdate()
         {
-            cc.UpdateMotor();               // updates the ThirdPersonMotor methods
-            cc.ControlLocomotionType();     // handle the controller locomotion type and movespeed
-            cc.ControlRotationType();       // handle the controller rotation type
+            cc.UpdateMotor();
+            cc.ControlLocomotionType();
+            cc.ControlRotationType();
         }
 
         protected virtual void Update()
         {
-            InputHandle();                  // update the input methods
-            cc.UpdateAnimator();            // updates the Animator Parameters
+            InputHandle();
+            cc.UpdateAnimator();
         }
 
         public virtual void OnAnimatorMove()
         {
-            cc.ControlAnimatorRootMotion(); // handle root motion animations 
+            cc.ControlAnimatorRootMotion();
         }
 
-        #region Basic Locomotion Inputs
+        // ── 输入处理 ──────────────────────────────────────────────
 
         protected virtual void InitilizeController()
         {
-            cc = GetComponent<vThirdPersonController>();
+            cc = GetComponent<ThirdPersonController>();
 
             if (cc != null)
                 cc.Init();
@@ -55,7 +55,7 @@ namespace Invector.vCharacterController
         {
             if (tpCamera == null)
             {
-                tpCamera = FindFirstObjectByType<vThirdPersonCamera>();
+                tpCamera = FindFirstObjectByType<ThirdPersonCamera>();
                 if (tpCamera == null)
                     return;
                 if (tpCamera)
@@ -109,7 +109,7 @@ namespace Invector.vCharacterController
             var mouse = Mouse.current;
             if (mouse == null) return;
 
-            var delta = mouse.delta.ReadValue() * mouseDeltaScale;
+            var delta = mouse.delta.ReadValue() * m_mouseDeltaScale;
             tpCamera.RotateCamera(delta.x, delta.y);
         }
 
@@ -136,14 +136,13 @@ namespace Invector.vCharacterController
         /// <summary>
         /// Conditions to trigger the Jump animation & behavior
         /// </summary>
-        /// <returns></returns>
         protected virtual bool JumpConditions()
         {
-            return cc.isGrounded && cc.GroundAngle() < cc.slopeLimit && !cc.isJumping && !cc.stopMove;
+            return cc.IsGrounded && cc.GroundAngle() < cc.SlopeLimit && !cc.IsJumping && !cc.StopMove;
         }
 
         /// <summary>
-        /// Input to trigger the Jump 
+        /// Input to trigger the Jump
         /// </summary>
         protected virtual void JumpInput()
         {
@@ -153,7 +152,5 @@ namespace Invector.vCharacterController
             if (keyboard.spaceKey.wasPressedThisFrame && JumpConditions())
                 cc.Jump();
         }
-
-        #endregion       
     }
 }

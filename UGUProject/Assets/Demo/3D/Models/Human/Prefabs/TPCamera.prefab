@@ -11,11 +11,10 @@ GameObject:
   - component: {fileID: 2700874171910072505}
   - component: {fileID: 2700874171910072509}
   - component: {fileID: 2700874171910072506}
-  - component: {fileID: 3851937974465073233}
   - component: {fileID: 2700874171910072507}
   - component: {fileID: 8733671044115070736}
   m_Layer: 0
-  m_Name: vThirdPersonCamera_LITE
+  m_Name: TPCamera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -95,25 +94,6 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2700874171910072504}
   m_Enabled: 1
---- !u!114 &3851937974465073233
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2700874171910072504}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 19c789670a80b704eba4dfebed94a111, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  header: About the Camera System
-  comment: "In the Full Version you will get: \n\n- CameraStates: You can create
-    different CameraStates for each states of your character, Aiming, Crouching,
-    etc..\n- CameraModes: You can set a Fixed Camera, Fixed that look at the Target,
-    Fixed Angles, Triggers to ChangeStates\n- Much more options like offsets, angle
-    limitation, smoothness, "
-  inEdit: 0
 --- !u!114 &2700874171910072507
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -126,20 +106,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a1bfe72fbc87d04e885296b53e91c66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
-  smoothCameraRotation: 12
-  cullingLayer:
+  m_target: {fileID: 0}
+  m_smoothCameraRotation: 12
+  m_cullingLayer:
     serializedVersion: 2
     m_Bits: 1
-  lockCamera: 0
-  rightOffset: 0
-  defaultDistance: 2.5
-  height: 1.4
-  smoothFollow: 10
-  xMouseSensitivity: 3
-  yMouseSensitivity: 3
-  yMinLimit: -40
-  yMaxLimit: 80
+  m_lockCamera: 0
+  m_rightOffset: 0
+  m_defaultDistance: 2.5
+  m_height: 1.4
+  m_smoothFollow: 10
+  m_xMouseSensitivity: 3
+  m_yMouseSensitivity: 3
+  m_yMinLimit: -40
+  m_yMaxLimit: 80
   indexList: 0
   indexLookPoint: 0
   offSetPlayerPivot: 0

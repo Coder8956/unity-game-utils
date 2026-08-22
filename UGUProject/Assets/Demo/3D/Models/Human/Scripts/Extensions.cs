@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Invector
 {
-    public static class vExtensions
+    public static class Extensions
     {
         public static T[] Append<T>(this T[] arrayInitial, T[] arrayToAppend)
         {
@@ -23,7 +23,7 @@ namespace Invector
             return ret;
         }
 
-        public static T[] vToArray<T>(this List<T> list)
+        public static T[] ToArray<T>(this List<T> list)
         {
             T[] array = new T[list.Count];
             if (list == null || list.Count == 0) return array;
