@@ -26,12 +26,11 @@ public class TPController : TPAnimator
         InitializeTpCamera();
     }
 
-    /// <summary>固定更新：驱动运动器与移动/旋转类型控制</summary>
+    /// <summary>固定更新：驱动运动器与移动类型控制</summary>
     protected virtual void FixedUpdate()
     {
         UpdateMotor();
         ControlLocomotionType();
-        ControlRotationType();
     }
 
     /// <summary>每帧更新：处理输入并更新动画</summary>
@@ -39,6 +38,12 @@ public class TPController : TPAnimator
     {
         InputHandle();
         UpdateAnimator();
+    }
+
+    /// <summary>延迟更新：在相机 Update 之后执行旋转控制，消除帧间延迟导致的转向卡顿</summary>
+    protected virtual void LateUpdate()
+    {
+        ControlRotationType();
     }
 
     /// <summary>动画根位移回调：由 Animator 驱动角色位移</summary>
@@ -225,18 +230,22 @@ public class TPController : TPAnimator
     {
         if (m_lockRotation) return;
 
-        // 判定是否需要旋转：有输入 或 配置了静止时跟随相机
-        bool validInput = Input != Vector3.zero || (IsStrafing ? m_strafeSpeed.rotateWithCamera : m_freeSpeed.rotateWithCamera);
+        // 判定是否需要旋转：有输入 或 瞄准模式（始终朝向相机）或 配置了静止时跟随相机
+        bool validInput = Input != Vector3.zero || IsStrafing || m_freeSpeed.rotateWithCamera;
 
         if (validInput)
         {
             // 平滑输入向量
             m_inputSmooth = Vector3.Lerp(m_inputSmooth, Input, (IsStrafing ? m_strafeSpeed.movementSmooth : m_freeSpeed.movementSmooth) * Time.deltaTime);
 
+            // 获取相机前方向：优先使用 TpCamera.LookForward（Update 中已更新），回退到 RotateTarget
+            Vector3 cameraForward = TpCamera != null ? TpCamera.LookForward : (RotateTarget ? RotateTarget.forward : Vector3.forward);
+
             // 确定旋转方向：
             // - 瞄准模式（非冲刺或允许瞄准冲刺）或静止且配置跟随相机 → 朝相机方向
             // - 否则 → 朝移动方向
-            Vector3 dir = (IsStrafing && (!IsSprinting || m_sprintOnlyFree == false) || (m_freeSpeed.rotateWithCamera && Input == Vector3.zero)) && RotateTarget ? RotateTarget.forward : m_moveDirection;
+            bool useCameraDir = (IsStrafing && (!IsSprinting || m_sprintOnlyFree == false) || (m_freeSpeed.rotateWithCamera && Input == Vector3.zero));
+            Vector3 dir = useCameraDir ? cameraForward : m_moveDirection;
             RotateToDirection(dir);
         }
     }

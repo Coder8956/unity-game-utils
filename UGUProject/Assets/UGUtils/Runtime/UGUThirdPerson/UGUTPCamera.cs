@@ -153,6 +153,9 @@ namespace UGU.Runtime
         public Transform CurrentTarget { get; private set; }
         public Vector2 MovementSpeed { get; private set; }
 
+    /// <summary>虚拟注视点的前方方向（在 Update 中更新，供角色控制器在 LateUpdate 中同帧读取）</summary>
+    public Vector3 LookForward => m_targetLookAt != null ? m_targetLookAt.forward : Vector3.forward;
+
         // ── 生命周期 ─────────────────────────────────────────────
 
         private void Start()
@@ -183,6 +186,13 @@ namespace UGU.Runtime
                         m_defaultDistance = Mathf.Clamp(m_defaultDistance - scroll * m_zoomSensitivity, m_minDistance,
                             m_maxDistance);
                     }
+                }
+
+                // 更新虚拟注视点旋转（前移至 Update，使角色控制器能在同帧 LateUpdate 中读取最新朝向）
+                if (m_targetLookAt != null)
+                {
+                    var newRot = Quaternion.Euler(m_mouseY, m_mouseX, 0);
+                    m_targetLookAt.rotation = Quaternion.Slerp(m_targetLookAt.rotation, newRot, m_smoothCameraRotation * Time.deltaTime);
                 }
             }
             else if (m_previewInEditor)
@@ -365,11 +375,6 @@ namespace UGU.Runtime
 
             // 更新虚拟注视点位置
             m_targetLookAt.position = m_currentCPos;
-
-            // 平滑旋转虚拟注视点
-            var newRot = Quaternion.Euler(m_mouseY, m_mouseX, 0);
-            m_targetLookAt.rotation =
-                Quaternion.Slerp(m_targetLookAt.rotation, newRot, m_smoothCameraRotation * dt);
 
             // 设置相机最终位置
             var finalPos = m_currentCPos + camDir * m_distance;
