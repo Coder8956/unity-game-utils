@@ -37,45 +37,45 @@ namespace UGU.Runtime
         [Header("Position")] [Tooltip("相机相对于目标右侧的偏移量")] [SerializeField]
         private float m_rightOffset = 0f;
 
-        [Tooltip("相机与目标之间的默认距离")] [SerializeField]
+        [Tooltip("相机与目标之间的默认距离")] [SerializeField] [Range(0.1f, 20f)]
         private float m_defaultDistance = 2.5f;
 
-        [Tooltip("相机相对于目标的高度偏移")] [SerializeField]
+        [Tooltip("相机相对于目标的高度偏移")] [SerializeField] [Range(0f, 10f)]
         private float m_height = 1.4f;
 
-        [Header("Smoothing")] [Tooltip("相机状态之间的旋转插值速度，值越大旋转越快")] [SerializeField]
+        [Header("Smoothing")] [Tooltip("相机状态之间的旋转插值速度，值越大旋转越快")] [SerializeField] [Range(0f, 50f)]
         private float m_smoothCameraRotation = 12f;
 
-        [Tooltip("相机位置跟随目标的平滑速度")] [SerializeField]
+        [Tooltip("相机位置跟随目标的平滑速度")] [SerializeField] [Range(0f, 50f)]
         private float m_smoothFollow = 10f;
 
         [Header("Zoom")] [Tooltip("是否启用鼠标滚轮缩放相机距离")] [SerializeField]
         private bool m_enableZoom = true;
 
-        [Tooltip("滚轮缩放灵敏度")] [SerializeField] private float m_zoomSensitivity = 0.01f;
+        [Tooltip("滚轮缩放灵敏度")] [SerializeField] [Range(0f, 1f)] private float m_zoomSensitivity = 0.01f;
 
-        [Tooltip("相机距离的最小值")] [SerializeField] private float m_minDistance = 1f;
+        [Tooltip("相机距离的最小值")] [SerializeField] [Range(0.1f, 10f)] private float m_minDistance = 1f;
 
-        [Tooltip("相机距离的最大值")] [SerializeField] private float m_maxDistance = 10f;
+        [Tooltip("相机距离的最大值")] [SerializeField] [Range(1f, 50f)] private float m_maxDistance = 10f;
 
         [Header("Rotation Input")]
         [Tooltip("相机旋转控制模式：Free=自由旋转，LeftButton=按住左键，RightButton=按住右键，MiddleButton=按住中键")]
         [SerializeField]
         private UGUTPCameraRotationMode m_rotationMode = UGUTPCameraRotationMode.Free;
 
-        [Tooltip("鼠标 X 轴（水平）旋转灵敏度")] [SerializeField]
+        [Tooltip("鼠标 X 轴（水平）旋转灵敏度")] [SerializeField] [Range(0f, 10f)]
         private float m_xMouseSensitivity = 3f;
 
-        [Tooltip("鼠标 Y 轴（垂直）旋转灵敏度")] [SerializeField]
+        [Tooltip("鼠标 Y 轴（垂直）旋转灵敏度")] [SerializeField] [Range(0f, 10f)]
         private float m_yMouseSensitivity = 3f;
 
-        [Tooltip("鼠标移动缩放系数，用于将原始像素增量转换为旋转量")] [SerializeField]
+        [Tooltip("鼠标移动缩放系数，用于将原始像素增量转换为旋转量")] [SerializeField] [Range(0f, 1f)]
         private float m_mouseDeltaScale = 0.1f;
 
-        [Tooltip("垂直方向最小俯角限制（度）")] [SerializeField]
+        [Tooltip("垂直方向最小俯角限制（度）")] [SerializeField] [Range(-90f, 0f)]
         private float m_yMinLimit = -40f;
 
-        [Tooltip("垂直方向最大仰角限制（度）")] [SerializeField]
+        [Tooltip("垂直方向最大仰角限制（度）")] [SerializeField] [Range(0f, 90f)]
         private float m_yMaxLimit = 80f;
 
         [Header("Collision")] [Tooltip("是否启用相机碰撞裁剪（避让遮挡物）")] [SerializeField]
@@ -284,10 +284,6 @@ namespace UGU.Runtime
             var dt = Time.deltaTime;
             var tr = transform;
 
-            // 距离平滑回弹到默认值
-            m_distance = Mathf.Lerp(m_distance, m_defaultDistance, m_smoothFollow * dt);
-            m_cullingDistance = Mathf.Lerp(m_cullingDistance, m_distance, dt);
-
             // 缓存注视点方向，避免多次访问 Transform 属性
             var lookForward = m_targetLookAt.forward;
             var lookRight = m_targetLookAt.right;
@@ -304,15 +300,14 @@ namespace UGU.Runtime
             var heightOffset = new Vector3(0, m_height, 0);
             m_desiredCPos = targetPos + heightOffset;
 
+            // 本帧期望距离（碰撞裁剪前的目标距离）
+            // 用局部变量承载裁剪结果，最后统一平滑 m_distance，避免先拉远再裁剪的来回抖动
+            var desiredDistance = m_defaultDistance;
+
             if (m_enableCulling && m_camera != null)
             {
                 // 当前位置 = 目标位置 + 当前高度（碰撞时可能更低）
                 m_currentCPos = m_currentTargetPos + new Vector3(0, m_currentHeight, 0);
-
-                // 计算近裁剪面四角在当前与期望位置的世界坐标
-                var camOffset = camDir * m_distance;
-                ClipPlanePoints planePoints = NearClipPlanePoints(m_camera, m_currentCPos + camOffset);
-                ClipPlanePoints oldPoints = NearClipPlanePoints(m_camera, m_desiredCPos + camOffset);
 
                 // 头顶高度检测：如果上方有遮挡物，逐步降低相机高度
                 if (Physics.SphereCast(targetPos, CheckHeightRadius, Vector3.up, out var hitInfo,
@@ -324,11 +319,14 @@ namespace UGU.Runtime
                     m_cullingHeight = Mathf.Lerp(m_height, m_cullingHeight, Mathf.Clamp(t, 0.0f, 1.0f));
                 }
 
-                // 期望位置的裁剪检测：如果有遮挡则压缩距离
-                if (CullingRayCast(m_desiredCPos, oldPoints, out hitInfo, m_distance + 0.2f, m_cullingLayer))
+                // 期望位置的裁剪检测：如果有遮挡则压缩期望距离
+                var camOffset = camDir * desiredDistance;
+                ClipPlanePoints oldPoints = NearClipPlanePoints(m_camera, m_desiredCPos + camOffset);
+
+                if (CullingRayCast(m_desiredCPos, oldPoints, out hitInfo, desiredDistance + 0.2f, m_cullingLayer))
                 {
-                    m_distance = hitInfo.distance - 0.2f;
-                    if (m_distance < m_defaultDistance)
+                    desiredDistance = hitInfo.distance - 0.2f;
+                    if (desiredDistance < m_defaultDistance)
                     {
                         // 距离过近时进一步降低相机高度
                         var t = hitInfo.distance;
@@ -344,9 +342,10 @@ namespace UGU.Runtime
                     m_currentHeight = m_height;
                 }
 
-                // 当前位置的裁剪检测：将距离限制在有效范围内
-                if (CullingRayCast(m_currentCPos, planePoints, out hitInfo, m_distance, m_cullingLayer))
-                    m_distance = Mathf.Clamp(m_cullingDistance, 0.0f, m_defaultDistance);
+                // 当前位置的裁剪检测：进一步限制期望距离
+                ClipPlanePoints planePoints = NearClipPlanePoints(m_camera, m_currentCPos + camDir * desiredDistance);
+                if (CullingRayCast(m_currentCPos, planePoints, out hitInfo, desiredDistance, m_cullingLayer))
+                    desiredDistance = Mathf.Min(desiredDistance, hitInfo.distance);
             }
             else
             {
@@ -354,6 +353,11 @@ namespace UGU.Runtime
                 m_currentHeight = m_height;
                 m_currentCPos = m_desiredCPos;
             }
+
+            // 平滑回弹：无遮挡时缓慢拉远到默认距离
+            m_distance = Mathf.Lerp(m_distance, desiredDistance, m_smoothFollow * dt);
+            // 碰撞收紧：不允许相机超过碰撞安全距离，防止穿模
+            m_distance = Mathf.Min(m_distance, desiredDistance);
 
             // 计算注视点：当前位置前方 + 右侧偏移分量
             var lookPoint = m_currentCPos + lookForward * 2f;

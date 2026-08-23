@@ -343,7 +343,7 @@ MonoBehaviour:
   m_smoothCameraRotation: 12
   m_smoothFollow: 10
   m_enableZoom: 1
-  m_zoomSensitivity: 0.01
+  m_zoomSensitivity: 1
   m_minDistance: 1
   m_maxDistance: 10
   m_rotationMode: 0
