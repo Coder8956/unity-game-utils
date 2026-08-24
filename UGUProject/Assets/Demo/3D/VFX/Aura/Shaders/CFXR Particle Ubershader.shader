@@ -314,7 +314,5 @@ Shader "Cartoon FX/Remaster/Particle Ubershader"
 		}
 
 	}
-	
-	CustomEditor "CartoonFX.MaterialInspector"
 }
 
