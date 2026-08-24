@@ -265,17 +265,21 @@ namespace UGU.Runtime
 
             // 计算相机方向：后向 + 右侧偏移（与运行时 CameraMovement 一致）
             var rotation = Quaternion.Euler(mouseY, mouseX, 0);
-            var camDir = (ForwardDir * (rotation * Vector3.forward) + m_rightOffset * (rotation * Vector3.right)).normalized;
+            var lookForward = rotation * Vector3.forward;
+            var lookRight = rotation * Vector3.right;
+            var camDir = (ForwardDir * lookForward + m_rightOffset * lookRight).normalized;
 
             // 目标位置 + 高度偏移
             var targetPos = m_target.position;
             var heightOffset = new Vector3(0, m_height, 0);
-            var cameraPos = targetPos + heightOffset + camDir * m_defaultDistance;
+            var pivotPos = targetPos + heightOffset;
+            var cameraPos = pivotPos + camDir * m_defaultDistance;
 
             transform.position = cameraPos;
 
-            // 相机朝向目标点（含高度偏移）
-            var lookPoint = targetPos + heightOffset;
+            // 注视点：与运行时一致，包含前向偏移和右侧偏移分量
+            var lookPoint = pivotPos + lookForward * 2f;
+            lookPoint += lookRight * Vector3.Dot(camDir * m_defaultDistance, lookRight);
             transform.rotation = Quaternion.LookRotation(lookPoint - cameraPos);
         }
 

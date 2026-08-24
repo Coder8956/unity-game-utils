@@ -357,7 +357,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   m_lockOnRun: 0
-  m_previewInEditor: 0
+  m_previewInEditor: 1
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0

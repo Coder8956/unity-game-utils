@@ -167,8 +167,8 @@ MonoBehaviour:
     y: 0
     width: 857
     height: 396
-  m_MinSize: {x: 200, y: 200}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 201, y: 226}
+  m_MaxSize: {x: 4001, y: 4026}
   m_ActualView: {fileID: 17}
   m_Panes:
   - {fileID: 17}
@@ -325,8 +325,8 @@ MonoBehaviour:
     y: 0
     width: 363
     height: 613
-  m_MinSize: {x: 275, y: 50}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 276, y: 76}
+  m_MaxSize: {x: 4001, y: 4026}
   m_ActualView: {fileID: 22}
   m_Panes:
   - {fileID: 22}
@@ -379,8 +379,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "UnityEditor.MainToolbarWindow\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 1
-    y: 51
+    x: 0
+    y: 0
     width: 1918
     height: 36
   m_SerializedDataModeController:
@@ -659,8 +659,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Game\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 1
-    y: 483
+    x: 0
+    y: 420
     width: 856
     height: 502
   m_SerializedDataModeController:
@@ -762,8 +762,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Scene\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 1
-    y: 87
+    x: 0
+    y: 24
     width: 856
     height: 370
   m_SerializedDataModeController:
@@ -1218,7 +1218,7 @@ MonoBehaviour:
   m_Rotation:
     m_Target: {x: 0, y: 0, z: 0, w: 1}
     speed: 2
-    m_Value: {x: 0, y: 0, z: 0, w: 1}
+    m_Value: {x: -0, y: 0, z: -0, w: -1}
   m_Size:
     m_Target: 169.22476
     speed: 2
@@ -1371,8 +1371,7 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs:
-      - m_Data: 45776
+      m_SelectedIDs: []
       m_LastClickedID:
         m_Data: 0
       m_ExpandedIDs:
@@ -1418,13 +1417,13 @@ MonoBehaviour:
   m_MaxSize: {x: 8192, y: 331}
   m_TitleContent:
     m_Text: ' Tuanjie AI Bridge'
-    m_Image: {fileID: 2800000, guid: d3c3e00a8e9a09f478d6ad9bc04ef286, type: 3}
+    m_Image: {fileID: 0}
     m_Tooltip: 
     m_TextWithWhitespace: " Tuanjie AI Bridge\u200B"
   m_Pos:
     serializedVersion: 2
     x: 858
-    y: 87
+    y: 24
     width: 351
     height: 898
   m_SerializedDataModeController:
@@ -1461,8 +1460,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Project\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 1211
-    y: 87
+    x: 1
+    y: 24
     width: 343
     height: 587
   m_SerializedDataModeController:
@@ -1539,6 +1538,10 @@ MonoBehaviour:
     - m_Data: 49512
     - m_Data: 49514
     - m_Data: 49516
+    - m_Data: 49518
+    - m_Data: 49520
+    - m_Data: 49522
+    - m_Data: 49524
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1597,12 +1600,12 @@ MonoBehaviour:
     - m_Data: 49508
     - m_Data: 49510
     - m_Data: 49512
+    - m_Data: 49514
     - m_Data: 49516
-    - m_Data: 49890
-    - m_Data: 49894
-    - m_Data: 49914
-    - m_Data: 49994
-    - m_Data: 50006
+    - m_Data: 49518
+    - m_Data: 49520
+    - m_Data: 49522
+    - m_Data: 49524
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1684,8 +1687,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Inspector\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 1556
-    y: 87
+    x: 346
+    y: 24
     width: 362
     height: 587
   m_SerializedDataModeController:
@@ -1735,8 +1738,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Console\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 1211
-    y: 700
+    x: 1
+    y: 637
     width: 707
     height: 285
   m_SerializedDataModeController:
