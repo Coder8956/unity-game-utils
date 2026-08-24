@@ -10,6 +10,35 @@ using UnityEngine.InputSystem;
 /// </summary>
 public class UGUTPHController : UGUTPHAnimator
 {
+    // ── 输入配置 ──────────────────────────────────────────────
+
+    [Header("Input")]
+
+    [Tooltip("向前移动按键（主）")]
+    [SerializeField] protected Key m_moveForwardKey = Key.W;
+    [Tooltip("向后移动按键（主）")]
+    [SerializeField] protected Key m_moveBackwardKey = Key.S;
+    [Tooltip("向左移动按键（主）")]
+    [SerializeField] protected Key m_moveLeftKey = Key.A;
+    [Tooltip("向右移动按键（主）")]
+    [SerializeField] protected Key m_moveRightKey = Key.D;
+
+    [Tooltip("向前移动按键（备用，方向键）")]
+    [SerializeField] protected Key m_moveForwardAltKey = Key.UpArrow;
+    [Tooltip("向后移动按键（备用，方向键）")]
+    [SerializeField] protected Key m_moveBackwardAltKey = Key.DownArrow;
+    [Tooltip("向左移动按键（备用，方向键）")]
+    [SerializeField] protected Key m_moveLeftAltKey = Key.LeftArrow;
+    [Tooltip("向右移动按键（备用，方向键）")]
+    [SerializeField] protected Key m_moveRightAltKey = Key.RightArrow;
+
+    [Tooltip("瞄准/横移切换按键")]
+    [SerializeField] protected Key m_strafeKey = Key.Tab;
+    [Tooltip("冲刺按键")]
+    [SerializeField] protected Key m_sprintKey = Key.LeftShift;
+    [Tooltip("跳跃按键")]
+    [SerializeField] protected Key m_jumpKey = Key.Space;
+
     // ── 运行时状态 ──────────────────────────────────────────
 
     /// <summary>场景中的第三人称相机</summary>
@@ -92,10 +121,10 @@ public class UGUTPHController : UGUTPHAnimator
         if (keyboard == null) return;
 
         var newInput = Input;
-        newInput.x = (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed ? 1f : 0f)
-                   - (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed ? 1f : 0f);
-        newInput.z = (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed ? 1f : 0f)
-                   - (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed ? 1f : 0f);
+        newInput.x = (keyboard[m_moveRightKey].isPressed || keyboard[m_moveRightAltKey].isPressed ? 1f : 0f)
+                   - (keyboard[m_moveLeftKey].isPressed || keyboard[m_moveLeftAltKey].isPressed ? 1f : 0f);
+        newInput.z = (keyboard[m_moveForwardKey].isPressed || keyboard[m_moveForwardAltKey].isPressed ? 1f : 0f)
+                   - (keyboard[m_moveBackwardKey].isPressed || keyboard[m_moveBackwardAltKey].isPressed ? 1f : 0f);
         Input = newInput;
     }
 
@@ -128,7 +157,7 @@ public class UGUTPHController : UGUTPHAnimator
         var keyboard = Keyboard.current;
         if (keyboard == null) return;
 
-        if (keyboard.tabKey.wasPressedThisFrame)
+        if (keyboard[m_strafeKey].wasPressedThisFrame)
             Strafe();
     }
 
@@ -140,9 +169,9 @@ public class UGUTPHController : UGUTPHAnimator
         var keyboard = Keyboard.current;
         if (keyboard == null) return;
 
-        if (keyboard.leftShiftKey.wasPressedThisFrame)
+        if (keyboard[m_sprintKey].wasPressedThisFrame)
             Sprint(true);
-        else if (keyboard.leftShiftKey.wasReleasedThisFrame)
+        else if (keyboard[m_sprintKey].wasReleasedThisFrame)
             Sprint(false);
     }
 
@@ -163,7 +192,7 @@ public class UGUTPHController : UGUTPHAnimator
         var keyboard = Keyboard.current;
         if (keyboard == null) return;
 
-        if (keyboard.spaceKey.wasPressedThisFrame && JumpConditions())
+        if (keyboard[m_jumpKey].wasPressedThisFrame && JumpConditions())
             Jump();
     }
 
