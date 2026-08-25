@@ -160,6 +160,9 @@ public class UGUTPHMotor : MonoBehaviour
             frictionCombine = PhysicsMaterialCombine.Minimum
         };
 
+        // strafe 模式始终跟随相机转向，固定覆盖 Inspector 配置
+        m_strafeSpeed.rotateWithCamera = true;
+
         m_rigidbody = GetComponent<Rigidbody>();
         m_capsuleCollider = GetComponent<CapsuleCollider>();
 
@@ -534,7 +537,8 @@ public class UGUTPHMotor : MonoBehaviour
         [Tooltip("默认行走（关闭则默认跑步）")]
         public bool walkByDefault = false;
 
-        [Tooltip("静止时是否跟随相机朝向旋转")]
+        [Tooltip("静止时是否跟随相机朝向旋转（仅自由移动模式生效，strafe 模式固定为 true）")]
+        [HideInInspector]
         public bool rotateWithCamera = false;
 
         [Tooltip("行走速度（刚体驱动，或根位移时的额外速度）")]
