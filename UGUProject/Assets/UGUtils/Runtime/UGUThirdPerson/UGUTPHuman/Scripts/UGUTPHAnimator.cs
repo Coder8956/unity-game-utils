@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 
+namespace UGU.Runtime
+{
 /// <summary>
 /// 第三人称动画控制器。
 /// 继承自 UGUTPHMotor，负责将运动状态同步到 Animator 参数，
@@ -101,4 +103,5 @@ public static partial class UGUTPHAnimatorParameters
     public static int IsSprinting = Animator.StringToHash("IsSprinting");
     /// <summary>与地面的距离</summary>
     public static int GroundDistance = Animator.StringToHash("GroundDistance");
+}
 }

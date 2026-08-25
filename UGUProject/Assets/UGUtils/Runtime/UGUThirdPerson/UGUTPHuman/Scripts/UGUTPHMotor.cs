@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 
+namespace UGU.Runtime
+{
 /// <summary>
 /// 第三人称运动器（基类）。
 /// 负责角色的物理初始化、地面检测、坡度限制、移动、旋转、
@@ -550,4 +552,5 @@ public class UGUTPHMotor : MonoBehaviour
         [Tooltip("冲刺速度（刚体驱动，或根位移时的额外速度）")]
         public float sprintSpeed = 6f;
     }
+}
 }

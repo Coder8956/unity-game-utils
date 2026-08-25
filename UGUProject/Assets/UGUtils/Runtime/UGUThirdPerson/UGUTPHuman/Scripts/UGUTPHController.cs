@@ -1,7 +1,8 @@
-﻿using UGU.Runtime;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
+namespace UGU.Runtime
+{
 /// <summary>
 /// 第三人称控制器。
 /// 继承自 UGUTPHAnimator，负责根位移控制、移动类型切换、
@@ -374,4 +375,5 @@ public class UGUTPHController : UGUTPHAnimator
         else
             m_animator.CrossFadeInFixedTime("JumpMove", .2f);
     }
+}
 }
