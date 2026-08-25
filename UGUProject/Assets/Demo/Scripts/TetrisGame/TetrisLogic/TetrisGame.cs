@@ -7,9 +7,7 @@ namespace ZNGTetris.Logic
     /// 俄罗斯方块游戏控制器（逻辑层核心）。
     /// 作为 MonoBehaviour 挂载到 GameObject，统筹棋盘、方块、碰撞、消行、生成等子系统。
     /// 通过 <see cref="ITetrisView"/> 接口与显示层通信，不直接操作 Transform / GameObject。
-    /// 使用 <see cref="ExecuteAlways"/> 支持编辑模式下将棋盘尺寸推送给显示层进行边框预览。
     /// </summary>
-    [ExecuteAlways]
     public class TetrisGame : MonoBehaviour
     {
         // ── Inspector 字段 ────────────────────────────────────────
