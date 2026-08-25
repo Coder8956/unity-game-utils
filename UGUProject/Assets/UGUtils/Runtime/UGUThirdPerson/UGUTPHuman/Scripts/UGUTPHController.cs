@@ -259,8 +259,8 @@ public class UGUTPHController : UGUTPHAnimator
     {
         if (m_lockRotation) return;
 
-        // 判定是否需要旋转：有输入 或 瞄准模式（始终朝向相机）或 配置了静止时跟随相机
-        bool validInput = Input != Vector3.zero || IsStrafing || m_freeSpeed.rotateWithCamera;
+        // 判定是否需要旋转：有输入 或 瞄准模式（配置跟随相机时朝向相机）或 配置了静止时跟随相机
+        bool validInput = Input != Vector3.zero || (IsStrafing ? m_strafeSpeed.rotateWithCamera : m_freeSpeed.rotateWithCamera);
 
         if (validInput)
         {
