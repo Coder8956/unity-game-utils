@@ -18,8 +18,8 @@ namespace ZNGTetris.View
         // ── Inspector 字段 ────────────────────────────────────────
 
         [Header("3D 配置")]
-        [Tooltip("格子材质（为空时使用 Cube 默认材质）")]
-        [SerializeField] private Material m_cellMaterial;
+        [Tooltip("组成方块的元素预制体（为空时使用默认 Cube）")]
+        [SerializeField] private GameObject m_cellPrefab;
 
         [Tooltip("下落方块相对于棋盘格子的 Z 轴偏移（避免 Z-fighting）")]
         [SerializeField] private float m_pieceZOffset = -0.05f;
@@ -42,25 +42,37 @@ namespace ZNGTetris.View
             if (isPiece)
                 localPos.z += m_pieceZOffset;
 
-            GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            go.name = $"Cell_{type}";
-            go.transform.SetParent(transform, false);
-            go.transform.localPosition = localPos;
-            go.transform.localScale = Vector3.one * m_cellSize;
-
-            // 移除碰撞体（仅用于显示）
-            Collider collider = go.GetComponent<Collider>();
-            if (collider != null)
-                SafeDestroy(collider);
-
-            Renderer renderer = go.GetComponent<Renderer>();
-            if (m_cellMaterial != null)
-            {
-                renderer.sharedMaterial = m_cellMaterial;
-            }
-
             Color color = m_colorConfig != null ? m_colorConfig.GetColor(type) : Color.white;
-            SetCellColor(renderer, color);
+
+            GameObject go;
+            if (m_cellPrefab != null)
+            {
+                go = Instantiate(m_cellPrefab, transform, false);
+                go.name = $"Cell_{type}";
+                go.transform.localPosition = localPos;
+                go.transform.localScale = Vector3.one * m_cellSize;
+
+                if (go.TryGetComponent<Renderer>(out var renderer))
+                {
+                    SetCellColor(renderer, color);
+                }
+            }
+            else
+            {
+                go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                go.name = $"Cell_{type}";
+                go.transform.SetParent(transform, false);
+                go.transform.localPosition = localPos;
+                go.transform.localScale = Vector3.one * m_cellSize;
+
+                Collider collider = go.GetComponent<Collider>();
+                if (collider != null)
+                    SafeDestroy(collider);
+
+                Renderer renderer = go.GetComponent<Renderer>();
+
+                SetCellColor(renderer, color);
+            }
 
             return go;
         }
@@ -105,8 +117,6 @@ namespace ZNGTetris.View
                     SafeDestroy(collider);
 
                 Renderer renderer = go.GetComponent<Renderer>();
-                if (m_cellMaterial != null)
-                    renderer.sharedMaterial = m_cellMaterial;
 
                 SetCellColor(renderer, m_borderColor);
             }

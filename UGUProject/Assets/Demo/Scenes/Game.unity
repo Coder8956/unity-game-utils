@@ -627,7 +627,7 @@ MonoBehaviour:
     m_colorJ: {r: 0, g: 0.3, b: 1, a: 1}
     m_colorL: {r: 1, g: 0.5, b: 0, a: 1}
   m_showBorder: 1
-  m_borderColor: {r: 0.25, g: 0.25, b: 0.25, a: 1}
+  m_borderColor: {r: 1, g: 1, b: 1, a: 1}
   m_borderHorizontalPrefab: {fileID: 0}
   m_borderVerticalPrefab: {fileID: 0}
   m_borderCornerBottomLeftPrefab: {fileID: 0}
@@ -640,7 +640,7 @@ MonoBehaviour:
   m_showFullPiece: 0
   m_previewWidth: 10
   m_previewHeight: 20
-  m_cellMaterial: {fileID: 0}
+  m_cellPrefab: {fileID: 0}
   m_pieceZOffset: -0.05
 --- !u!1 &832575517
 GameObject:
