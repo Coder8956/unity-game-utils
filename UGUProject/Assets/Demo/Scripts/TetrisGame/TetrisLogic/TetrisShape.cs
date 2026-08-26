@@ -5,7 +5,7 @@ namespace ZNGTetris.Logic
 {
     /// <summary>
     /// 方块形状数据库，提供 I/O/T/S/Z/J/L 七种方块在 4 个旋转状态下的 Cell 偏移坐标。
-    /// 所有坐标均为相对于 Piece.Position 的局部偏移。
+    /// 所有坐标均为相对于 Piece.Position 的局部偏移，y 轴向上（Unity 坐标系）。
     /// </summary>
     public static class TetrisShape
     {
@@ -36,79 +36,79 @@ namespace ZNGTetris.Logic
         // Rot0: .X. / XXX    Rot1: X. / XX / X.    Rot2: XXX / .X.    Rot3: .X / XX / .X
         private static readonly Vector2Int[] TRot0 =
         {
-            new Vector2Int(1, 0), new Vector2Int(0, 1), new Vector2Int(1, 1), new Vector2Int(2, 1)
+            new Vector2Int(1, 1), new Vector2Int(0, 0), new Vector2Int(1, 0), new Vector2Int(2, 0)
         };
         private static readonly Vector2Int[] TRot1 =
         {
-            new Vector2Int(0, 0), new Vector2Int(0, 1), new Vector2Int(1, 1), new Vector2Int(0, 2)
+            new Vector2Int(0, 2), new Vector2Int(0, 1), new Vector2Int(1, 1), new Vector2Int(0, 0)
         };
         private static readonly Vector2Int[] TRot2 =
         {
-            new Vector2Int(0, 0), new Vector2Int(1, 0), new Vector2Int(2, 0), new Vector2Int(1, 1)
+            new Vector2Int(0, 1), new Vector2Int(1, 1), new Vector2Int(2, 1), new Vector2Int(1, 0)
         };
         private static readonly Vector2Int[] TRot3 =
         {
-            new Vector2Int(1, 0), new Vector2Int(0, 1), new Vector2Int(1, 1), new Vector2Int(1, 2)
+            new Vector2Int(1, 2), new Vector2Int(0, 1), new Vector2Int(1, 1), new Vector2Int(1, 0)
         };
 
         // S:
         // Rot0: .XX / XX.    Rot1: X. / XX / .X
         private static readonly Vector2Int[] SRot0 =
         {
-            new Vector2Int(1, 0), new Vector2Int(2, 0), new Vector2Int(0, 1), new Vector2Int(1, 1)
+            new Vector2Int(1, 1), new Vector2Int(2, 1), new Vector2Int(0, 0), new Vector2Int(1, 0)
         };
         private static readonly Vector2Int[] SRot1 =
         {
-            new Vector2Int(0, 0), new Vector2Int(0, 1), new Vector2Int(1, 1), new Vector2Int(1, 2)
+            new Vector2Int(0, 2), new Vector2Int(0, 1), new Vector2Int(1, 1), new Vector2Int(1, 0)
         };
 
         // Z:
         // Rot0: XX. / .XX    Rot1: .X / XX / X.
         private static readonly Vector2Int[] ZRot0 =
         {
-            new Vector2Int(0, 0), new Vector2Int(1, 0), new Vector2Int(1, 1), new Vector2Int(2, 1)
+            new Vector2Int(0, 1), new Vector2Int(1, 1), new Vector2Int(1, 0), new Vector2Int(2, 0)
         };
         private static readonly Vector2Int[] ZRot1 =
         {
-            new Vector2Int(1, 0), new Vector2Int(0, 1), new Vector2Int(1, 1), new Vector2Int(0, 2)
+            new Vector2Int(1, 2), new Vector2Int(0, 1), new Vector2Int(1, 1), new Vector2Int(0, 0)
         };
 
         // J:
         // Rot0: X.. / XXX    Rot1: XX / X. / X.    Rot2: XXX / ..X    Rot3: .X / .X / XX
         private static readonly Vector2Int[] JRot0 =
         {
-            new Vector2Int(0, 0), new Vector2Int(0, 1), new Vector2Int(1, 1), new Vector2Int(2, 1)
+            new Vector2Int(0, 1), new Vector2Int(0, 0), new Vector2Int(1, 0), new Vector2Int(2, 0)
         };
         private static readonly Vector2Int[] JRot1 =
         {
-            new Vector2Int(0, 0), new Vector2Int(1, 0), new Vector2Int(0, 1), new Vector2Int(0, 2)
+            new Vector2Int(0, 2), new Vector2Int(1, 2), new Vector2Int(0, 1), new Vector2Int(0, 0)
         };
         private static readonly Vector2Int[] JRot2 =
         {
-            new Vector2Int(0, 0), new Vector2Int(1, 0), new Vector2Int(2, 0), new Vector2Int(2, 1)
+            new Vector2Int(0, 1), new Vector2Int(1, 1), new Vector2Int(2, 1), new Vector2Int(2, 0)
         };
         private static readonly Vector2Int[] JRot3 =
         {
-            new Vector2Int(1, 0), new Vector2Int(1, 1), new Vector2Int(0, 2), new Vector2Int(1, 2)
+            new Vector2Int(1, 2), new Vector2Int(1, 1), new Vector2Int(0, 0), new Vector2Int(1, 0)
         };
 
         // L:
         // Rot0: ..X / XXX    Rot1: X. / X. / XX    Rot2: XXX / X..    Rot3: XX / .X / .X
         private static readonly Vector2Int[] LRot0 =
         {
-            new Vector2Int(2, 0), new Vector2Int(0, 1), new Vector2Int(1, 1), new Vector2Int(2, 1)
+            new Vector2Int(2, 1), new Vector2Int(0, 0), new Vector2Int(1, 0), new Vector2Int(2, 0)
         };
         private static readonly Vector2Int[] LRot1 =
         {
-            new Vector2Int(0, 0), new Vector2Int(0, 1), new Vector2Int(0, 2), new Vector2Int(1, 2)
+            new Vector2Int(0, 2), new Vector2Int(0, 1), new Vector2Int(0, 0), new Vector2Int(1, 0)
         };
         private static readonly Vector2Int[] LRot2 =
         {
-            new Vector2Int(0, 0), new Vector2Int(1, 0), new Vector2Int(2, 0), new Vector2Int(0, 1)
+            new Vector2Int(0, 1), new Vector2Int(1, 1), new Vector2Int(2, 1), new Vector2Int(0, 0)
         };
         private static readonly Vector2Int[] LRot3 =
         {
-            new Vector2Int(0, 0), new Vector2Int(1, 0), new Vector2Int(1, 1), new Vector2Int(1, 2)
+            new Vector2Int(0, 2), new Vector2Int(1, 2), new Vector2Int(1, 1), new Vector2Int(1, 0)
         };
 
         // ── 旋转查表 ──────────────────────────────────────────────

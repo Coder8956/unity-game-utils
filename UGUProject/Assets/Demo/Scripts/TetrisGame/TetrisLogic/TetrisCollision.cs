@@ -5,6 +5,7 @@ namespace ZNGTetris.Logic
     /// <summary>
     /// 碰撞检测系统，负责判断方块在给定位置和旋转状态下是否合法。
     /// 核心算法：逐个检查 Cell 的棋盘坐标是否越界或与已固定方块重叠。
+    /// 允许方块部分位于棋盘上方（出生区域），仅检查棋盘内的碰撞。
     /// </summary>
     public class TetrisCollision
     {
@@ -27,7 +28,8 @@ namespace ZNGTetris.Logic
         // ── 公共入口 ──────────────────────────────────────────────
 
         /// <summary>
-        /// 判断给定 Cells 在指定位置下是否合法（不越界、不与固定方块重叠）。
+        /// 判断给定 Cells 在指定位置下是否合法。
+        /// 允许方块部分位于棋盘上方（y >= Height），仅检查水平越界和棋盘内碰撞。
         /// </summary>
         public bool IsValid(TetrisBoard board, Vector2Int position, Vector2Int[] cells)
         {
@@ -35,9 +37,19 @@ namespace ZNGTetris.Logic
             {
                 Vector2Int boardPos = position + cells[i];
 
-                if (!board.IsInside(boardPos.x, boardPos.y))
+                // 水平越界始终非法
+                if (boardPos.x < 0 || boardPos.x >= board.Width)
                     return false;
 
+                // 棋盘下方越界始终非法
+                if (boardPos.y < 0)
+                    return false;
+
+                // 棋盘上方的 Cell（出生区域）跳过碰撞检查
+                if (boardPos.y >= board.Height)
+                    continue;
+
+                // 棋盘内的 Cell 检查是否已被占用
                 if (board.IsOccupied(boardPos.x, boardPos.y))
                     return false;
             }

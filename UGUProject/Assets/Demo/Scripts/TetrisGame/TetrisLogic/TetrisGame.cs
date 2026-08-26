@@ -37,23 +37,23 @@ namespace ZNGTetris.Logic
         [SerializeField] private bool m_autoStart;
 
         [Header("输入配置")]
-        [Tooltip("左移输入动作")]
-        [SerializeField] private InputAction m_moveLeftAction = new InputAction(expectedControlType: "Button", binding: "<Keyboard>/leftArrow");
+        [Tooltip("左移输入动作（Left Arrow / A）")]
+        [SerializeField] private InputAction m_moveLeftAction = new InputAction("Move Left", expectedControlType: "Button", binding: "<Keyboard>/leftArrow");
 
-        [Tooltip("右移输入动作")]
-        [SerializeField] private InputAction m_moveRightAction = new InputAction(expectedControlType: "Button", binding: "<Keyboard>/rightArrow");
+        [Tooltip("右移输入动作（Right Arrow / D）")]
+        [SerializeField] private InputAction m_moveRightAction = new InputAction("Move Right", expectedControlType: "Button", binding: "<Keyboard>/rightArrow");
 
-        [Tooltip("旋转输入动作")]
-        [SerializeField] private InputAction m_rotateAction = new InputAction(expectedControlType: "Button", binding: "<Keyboard>/upArrow");
+        [Tooltip("旋转输入动作（Up Arrow / W）")]
+        [SerializeField] private InputAction m_rotateAction = new InputAction("Rotate", expectedControlType: "Button", binding: "<Keyboard>/upArrow");
 
-        [Tooltip("软降输入动作（按住持续触发）")]
-        [SerializeField] private InputAction m_softDropAction = new InputAction(expectedControlType: "Button", binding: "<Keyboard>/downArrow");
+        [Tooltip("软降输入动作（Down Arrow / S，按住持续触发）")]
+        [SerializeField] private InputAction m_softDropAction = new InputAction("Soft Drop", expectedControlType: "Button", binding: "<Keyboard>/downArrow");
 
-        [Tooltip("硬降输入动作")]
-        [SerializeField] private InputAction m_hardDropAction = new InputAction(expectedControlType: "Button", binding: "<Keyboard>/space");
+        [Tooltip("硬降输入动作（Space）")]
+        [SerializeField] private InputAction m_hardDropAction = new InputAction("Hard Drop", expectedControlType: "Button", binding: "<Keyboard>/space");
 
-        [Tooltip("开始/重新开始输入动作")]
-        [SerializeField] private InputAction m_startAction = new InputAction(expectedControlType: "Button", binding: "<Keyboard>/enter");
+        [Tooltip("开始/重新开始输入动作（Enter）")]
+        [SerializeField] private InputAction m_startAction = new InputAction("Start", expectedControlType: "Button", binding: "<Keyboard>/enter");
 
         [Header("重复输入配置")]
         [Tooltip("DAS 延迟（秒）：按住方向键后多久开始自动重复")]
@@ -68,6 +68,10 @@ namespace ZNGTetris.Logic
         [Header("显示层")]
         [Tooltip("实现 ITetrisView 接口的 MonoBehaviour 组件")]
         [SerializeField] private MonoBehaviour m_viewComponent;
+
+        [Header("Debug")]
+        [Tooltip("游戏结束时在控制台打印棋盘状态（O=有元素, +=无元素）")]
+        [SerializeField] private bool m_printBoardOnOver;
 
         // ── 私有字段（运行时状态）────────────────────────────────
 
@@ -171,6 +175,24 @@ namespace ZNGTetris.Logic
         }
 
 #if UNITY_EDITOR
+        private void Reset()
+        {
+            // 设计文档要求的默认绑定：主键 + 副键
+            m_moveLeftAction = CreateDefaultAction("Move Left", "<Keyboard>/leftArrow", "<Keyboard>/a");
+            m_moveRightAction = CreateDefaultAction("Move Right", "<Keyboard>/rightArrow", "<Keyboard>/d");
+            m_rotateAction = CreateDefaultAction("Rotate", "<Keyboard>/upArrow", "<Keyboard>/w");
+            m_softDropAction = CreateDefaultAction("Soft Drop", "<Keyboard>/downArrow", "<Keyboard>/s");
+            m_hardDropAction = new InputAction("Hard Drop", expectedControlType: "Button", binding: "<Keyboard>/space");
+            m_startAction = new InputAction("Start", expectedControlType: "Button", binding: "<Keyboard>/enter");
+        }
+
+        private static InputAction CreateDefaultAction(string name, string primaryPath, string secondaryPath)
+        {
+            var action = new InputAction(name, expectedControlType: "Button", binding: primaryPath);
+            action.AddBinding(secondaryPath);
+            return action;
+        }
+
         private void OnValidate()
         {
             if (Application.isPlaying)
@@ -329,29 +351,35 @@ namespace ZNGTetris.Logic
         private void SpawnPiece()
         {
             m_currentPiece = m_spawner.Spawn();
-            Vector2Int[] cells = m_currentPiece.GetCells();
-
-            // 生成位置已被占用 → 游戏结束
-            if (!m_collision.IsValid(m_board, m_currentPiece.Position, cells))
-            {
-                GameOver();
-                return;
-            }
-
             m_view?.OnPieceSpawned(m_currentPiece);
         }
 
         private void LockPiece()
         {
-            // 将当前方块写入棋盘
-            Vector2Int[] cells = m_currentPiece.GetCells();
-            for (int i = 0; i < cells.Length; i++)
+            // 方块部分在棋盘外（上方）→ 无法全部写入棋盘 → 游戏结束
+            // 运算结束后，在棋盘内且不覆盖已写入位置的格子写入棋盘，在棋盘外的直接丢弃
+            if (!IsPieceFullyInside())
             {
-                Vector2Int pos = m_currentPiece.Position + cells[i];
-                if (m_board.IsInside(pos.x, pos.y))
+                Vector2Int[] cells = m_currentPiece.GetCells();
+                for (int i = 0; i < cells.Length; i++)
                 {
-                    m_board.SetCell(pos.x, pos.y, m_currentPiece.Type);
+                    Vector2Int pos = m_currentPiece.Position + cells[i];
+                    if (m_board.IsInside(pos.x, pos.y) && !m_board.IsOccupied(pos.x, pos.y))
+                    {
+                        m_board.SetCell(pos.x, pos.y, m_currentPiece.Type);
+                    }
                 }
+
+                GameOver();
+                return;
+            }
+
+            // 将当前方块写入棋盘
+            Vector2Int[] lockCells = m_currentPiece.GetCells();
+            for (int i = 0; i < lockCells.Length; i++)
+            {
+                Vector2Int pos = m_currentPiece.Position + lockCells[i];
+                m_board.SetCell(pos.x, pos.y, m_currentPiece.Type);
             }
 
             m_view?.OnPieceLocked(m_currentPiece);
@@ -378,7 +406,15 @@ namespace ZNGTetris.Logic
         {
             m_isGameOver = true;
             m_isGameRunning = false;
+
+            TetrisPiece lastPiece = m_currentPiece;
             m_currentPiece = null;
+
+            if (m_printBoardOnOver)
+            {
+                PrintBoardState(lastPiece);
+            }
+
             m_view?.OnGameOver();
         }
 
@@ -470,7 +506,159 @@ namespace ZNGTetris.Logic
 
         private bool CanAcceptInput()
         {
-            return m_isGameRunning && !m_isGameOver && m_currentPiece != null;
+            return m_isGameRunning && !m_isGameOver && m_currentPiece != null && IsPiecePartiallyInside();
+        }
+
+        /// <summary>
+        /// 判断当前方块是否有任意 Cell 在棋盘内（用于输入门控）。
+        /// 方块在棋盘外生成，逐步向棋盘内移动，部分进入棋盘后才接受玩家输入。
+        /// </summary>
+        private bool IsPiecePartiallyInside()
+        {
+            if (m_currentPiece == null)
+                return false;
+
+            Vector2Int[] cells = m_currentPiece.GetCells();
+            for (int i = 0; i < cells.Length; i++)
+            {
+                Vector2Int pos = m_currentPiece.Position + cells[i];
+                if (m_board.IsInside(pos.x, pos.y))
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 判断当前方块是否所有 Cell 都在棋盘内（用于游戏结束判定）。
+        /// 方块无法全部写入棋盘时触发游戏结束。
+        /// </summary>
+        private bool IsPieceFullyInside()
+        {
+            if (m_currentPiece == null)
+                return false;
+
+            Vector2Int[] cells = m_currentPiece.GetCells();
+            for (int i = 0; i < cells.Length; i++)
+            {
+                Vector2Int pos = m_currentPiece.Position + cells[i];
+                if (!m_board.IsInside(pos.x, pos.y))
+                    return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// 在控制台打印棋盘最终状态（O=有元素, +=无元素），从顶部到底部逐行输出。
+        /// 包含列号头和行号，行列格式化对齐。
+        /// 在棋盘状态之外，用 O 和 + 打印最后一个方块的图案，并标注越界 Cells。
+        /// </summary>
+        private void PrintBoardState(TetrisPiece lastPiece)
+        {
+            if (m_board == null)
+                return;
+
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            sb.AppendLine("[TetrisGame] 棋盘最终状态:");
+
+            // 行号最大显示宽度
+            int rowLabelWidth = (m_board.Height - 1).ToString().Length;
+            // 每列显示宽度（列号最大位数 + 1 空格）
+            int colWidth = (m_board.Width - 1).ToString().Length + 1;
+
+            // 打印列头
+            sb.Append(' ', rowLabelWidth + 2);
+            for (int x = 0; x < m_board.Width; x++)
+            {
+                sb.Append(x.ToString().PadLeft(colWidth));
+            }
+
+            sb.AppendLine();
+
+            // 从顶部到底部逐行打印
+            for (int y = m_board.Height - 1; y >= 0; y--)
+            {
+                sb.Append(y.ToString().PadLeft(rowLabelWidth)).Append(" |");
+                for (int x = 0; x < m_board.Width; x++)
+                {
+                    char c = m_board.GetCell(x, y) != TetrisBlockType.Empty ? 'O' : '+';
+                    sb.Append(c.ToString().PadLeft(colWidth));
+                }
+
+                sb.AppendLine();
+            }
+
+            // 在棋盘状态之外，用 O 和 + 打印最后一个方块的图案
+            if (lastPiece != null)
+            {
+                Vector2Int[] cells = lastPiece.GetCells();
+
+                // 计算方块局部坐标的边界范围
+                int minX = int.MaxValue, maxX = int.MinValue;
+                int minY = int.MaxValue, maxY = int.MinValue;
+                for (int i = 0; i < cells.Length; i++)
+                {
+                    if (cells[i].x < minX) minX = cells[i].x;
+                    if (cells[i].x > maxX) maxX = cells[i].x;
+                    if (cells[i].y < minY) minY = cells[i].y;
+                    if (cells[i].y > maxY) maxY = cells[i].y;
+                }
+
+                sb.AppendLine();
+                sb.AppendLine("最后一个方块:");
+                sb.AppendLine($"  类型: {lastPiece.Type}  位置: ({lastPiece.Position.x}, {lastPiece.Position.y})  旋转: {lastPiece.Rotation}");
+                sb.AppendLine("  方块图案:");
+
+                // 列号显示宽度
+                int pieceColWidth = maxX.ToString().Length + 1;
+                int pieceRowLabelWidth = maxY.ToString().Length;
+
+                // 打印列头
+                sb.Append("  ");
+                sb.Append(' ', pieceRowLabelWidth + 2);
+                for (int x = minX; x <= maxX; x++)
+                {
+                    sb.Append(x.ToString().PadLeft(pieceColWidth));
+                }
+                sb.AppendLine();
+
+                // 从顶部到底部逐行打印图案
+                for (int y = maxY; y >= minY; y--)
+                {
+                    sb.Append("  ");
+                    sb.Append(y.ToString().PadLeft(pieceRowLabelWidth)).Append(" |");
+                    for (int x = minX; x <= maxX; x++)
+                    {
+                        bool isOccupied = false;
+                        for (int i = 0; i < cells.Length; i++)
+                        {
+                            if (cells[i].x == x && cells[i].y == y)
+                            {
+                                isOccupied = true;
+                                break;
+                            }
+                        }
+                        char c = isOccupied ? 'O' : '+';
+                        sb.Append(c.ToString().PadLeft(pieceColWidth));
+                    }
+                    sb.AppendLine();
+                }
+
+                // 打印棋盘坐标及越界标记
+                sb.Append("  棋盘坐标: ");
+                for (int i = 0; i < cells.Length; i++)
+                {
+                    Vector2Int worldCell = lastPiece.Position + cells[i];
+                    bool inBoard = m_board.IsInside(worldCell.x, worldCell.y);
+                    sb.Append($"({worldCell.x},{worldCell.y}){(inBoard ? "" : "[越界]")}");
+                    if (i < cells.Length - 1)
+                        sb.Append(" ");
+                }
+                sb.AppendLine();
+            }
+
+            Debug.Log(sb.ToString(), this);
         }
     }
 }

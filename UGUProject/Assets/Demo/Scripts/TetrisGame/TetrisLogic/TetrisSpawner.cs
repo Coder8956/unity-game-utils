@@ -4,7 +4,7 @@ namespace ZNGTetris.Logic
 {
     /// <summary>
     /// 方块生成系统，负责随机生成下一个方块并指定初始位置。
-    /// 方块从棋盘顶部中间位置生成。
+    /// 方块在棋盘上方（边框线）生成，逐步向棋盘内移动。
     /// </summary>
     public class TetrisSpawner
     {
@@ -31,7 +31,7 @@ namespace ZNGTetris.Logic
 
         /// <summary>
         /// 生成下一个方块，返回新的 TetrisPiece 实例。
-        /// 方块从棋盘顶部中间位置生成。
+        /// 方块在棋盘上方（边框线）生成，逐步向棋盘内移动。
         /// </summary>
         public TetrisPiece Spawn()
         {
@@ -39,7 +39,7 @@ namespace ZNGTetris.Logic
             NextType = RandomType();
 
             int spawnX = Mathf.FloorToInt(m_boardWidth / 2f) - 1;
-            int spawnY = m_boardHeight - 2;
+            int spawnY = m_boardHeight;
             Vector2Int position = new Vector2Int(spawnX, spawnY);
 
             return new TetrisPiece(type, position, 0);

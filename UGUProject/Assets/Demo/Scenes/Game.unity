@@ -162,8 +162,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d44d96f033833e143b8a9703bd31e3c5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ZNGTetris.TetrisGame
-  m_boardWidth: 26
+  m_EditorClassIdentifier: Assembly-CSharp::ZNGTetris.Logic.TetrisGame
+  m_boardWidth: 30
   m_boardHeight: 20
   m_baseFallInterval: 0.8
   m_levelSpeedStep: 0.05
@@ -173,14 +173,22 @@ MonoBehaviour:
   m_moveLeftAction:
     m_Name: Move Left
     m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: af25ba38-6504-4bb3-ba4a-41f7815cda18
+    m_ExpectedControlType: Button
+    m_Id: 690ce8f2-e476-4a33-8034-b2d86b267773
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings:
     - m_Name: 
-      m_Id: ac3d008d-c6c5-456b-b8a4-55c578ffc56b
+      m_Id: 3da149f1-b8f9-437d-9ad7-419cf11ac2d4
       m_Path: <Keyboard>/leftArrow
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Move Left
+      m_Flags: 0
+    - m_Name: 
+      m_Id: 932621ef-03be-4496-9493-77bfd109b3c0
+      m_Path: <Keyboard>/a
       m_Interactions: 
       m_Processors: 
       m_Groups: 
@@ -190,14 +198,22 @@ MonoBehaviour:
   m_moveRightAction:
     m_Name: Move Right
     m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: f3cd1a50-35f6-470d-99d5-2c3977557d45
+    m_ExpectedControlType: Button
+    m_Id: 8944f149-6dbc-4b2f-8413-f6e661610b61
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings:
     - m_Name: 
-      m_Id: c557ad7c-c73e-47eb-aa52-2c85db8902f5
+      m_Id: e31c01a0-49df-4648-9319-aeddadd0777e
       m_Path: <Keyboard>/rightArrow
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Move Right
+      m_Flags: 0
+    - m_Name: 
+      m_Id: 92bc3cea-b194-4f82-a493-57a1893f20f9
+      m_Path: <Keyboard>/d
       m_Interactions: 
       m_Processors: 
       m_Groups: 
@@ -207,14 +223,22 @@ MonoBehaviour:
   m_rotateAction:
     m_Name: Rotate
     m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 188b8c80-4ae5-4c60-b702-dc7dc61f8991
+    m_ExpectedControlType: Button
+    m_Id: 4187dd6f-9c7d-4c55-a25b-11a7d8192549
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings:
     - m_Name: 
-      m_Id: 46bac5f0-cc4e-4062-87ba-cca846c671e8
+      m_Id: 49da62af-ef2a-4d81-8e16-a332ec7ed037
       m_Path: <Keyboard>/upArrow
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Rotate
+      m_Flags: 0
+    - m_Name: 
+      m_Id: 5492fcfa-7d61-483f-adeb-8a653678b947
+      m_Path: <Keyboard>/w
       m_Interactions: 
       m_Processors: 
       m_Groups: 
@@ -224,14 +248,22 @@ MonoBehaviour:
   m_softDropAction:
     m_Name: Soft Drop
     m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 12f5d044-d15d-4700-84b8-31a671f39423
+    m_ExpectedControlType: Button
+    m_Id: 6107035e-4c68-43a4-99ec-b05ab1c5bedc
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings:
     - m_Name: 
-      m_Id: f59c0b83-4c5d-49c5-9159-c491b3ace9c1
+      m_Id: 8b67f1a1-e295-4e16-a5ee-dc01034a8146
       m_Path: <Keyboard>/downArrow
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Soft Drop
+      m_Flags: 0
+    - m_Name: 
+      m_Id: b4a36215-def8-4052-aa37-4b5ec63dd485
+      m_Path: <Keyboard>/s
       m_Interactions: 
       m_Processors: 
       m_Groups: 
@@ -241,13 +273,13 @@ MonoBehaviour:
   m_hardDropAction:
     m_Name: Hard Drop
     m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 87fbab80-ac75-4b40-b5d9-882cb15fa5bb
+    m_ExpectedControlType: Button
+    m_Id: a9445a5e-7c77-4293-ae7d-cd566937793c
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings:
     - m_Name: 
-      m_Id: eef4f901-f352-4bcb-844f-769bfdb329cd
+      m_Id: 6a7b7305-9f8f-4a9f-ba7c-b43e526a1127
       m_Path: <Keyboard>/space
       m_Interactions: 
       m_Processors: 
@@ -258,13 +290,13 @@ MonoBehaviour:
   m_startAction:
     m_Name: Start
     m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: e6587556-d985-4b61-8391-8de2442409a9
+    m_ExpectedControlType: Button
+    m_Id: 0c710cb9-f8ae-4406-b448-6c16f2ca9655
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings:
     - m_Name: 
-      m_Id: 26ca77da-a4a1-4c9d-b29a-b7bba45232e2
+      m_Id: 90a127e9-13f1-4772-a628-da0c3f26728d
       m_Path: <Keyboard>/enter
       m_Interactions: 
       m_Processors: 
@@ -276,6 +308,7 @@ MonoBehaviour:
   m_arrRate: 0.05
   m_softDropInterval: 0.05
   m_viewComponent: {fileID: 542262953}
+  m_printBoardOnOver: 1
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
