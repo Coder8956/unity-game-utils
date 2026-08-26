@@ -307,7 +307,7 @@ MonoBehaviour:
   m_dasDelay: 0.15
   m_arrRate: 0.05
   m_softDropInterval: 0.05
-  m_viewComponent: {fileID: 542262953}
+  m_viewComponent: {fileID: 1864576867}
   m_printBoardOnOver: 1
 --- !u!1 &330585543
 GameObject:
@@ -573,75 +573,6 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
---- !u!1 &542262950
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 542262952}
-  - component: {fileID: 542262953}
-  m_Layer: 0
-  m_Name: Tetris3DView
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &542262952
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 542262950}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &542262953
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 542262950}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b079c54049bc654098d8f0e9c80f2c9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ZNGTetris.View.Tetris3DView
-  m_cellSize: 25
-  m_colorConfig:
-    m_colorI: {r: 0, g: 1, b: 1, a: 1}
-    m_colorO: {r: 1, g: 1, b: 0, a: 1}
-    m_colorT: {r: 0.5, g: 0, b: 0.5, a: 1}
-    m_colorS: {r: 0, g: 1, b: 0, a: 1}
-    m_colorZ: {r: 1, g: 0, b: 0, a: 1}
-    m_colorJ: {r: 0, g: 0.3, b: 1, a: 1}
-    m_colorL: {r: 1, g: 0.5, b: 0, a: 1}
-  m_showBorder: 1
-  m_borderColor: {r: 1, g: 1, b: 1, a: 1}
-  m_borderHorizontalPrefab: {fileID: 0}
-  m_borderVerticalPrefab: {fileID: 0}
-  m_borderCornerBottomLeftPrefab: {fileID: 0}
-  m_borderCornerBottomRightPrefab: {fileID: 0}
-  m_borderCornerTopLeftPrefab: {fileID: 0}
-  m_borderCornerTopRightPrefab: {fileID: 0}
-  m_showBorderPreview: 1
-  m_showGridGizmos: 1
-  m_gridGizmoColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  m_showFullPiece: 0
-  m_previewWidth: 10
-  m_previewHeight: 20
-  m_cellPrefab: {fileID: 0}
-  m_pieceZOffset: -0.05
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -691,6 +622,75 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1864576866
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1864576868}
+  - component: {fileID: 1864576867}
+  m_Layer: 0
+  m_Name: Tetris3DView
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1864576867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1864576866}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b079c54049bc654098d8f0e9c80f2c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ZNGTetris.View.Tetris3DView
+  m_cellSize: 25
+  m_colorConfig:
+    m_colorI: {r: 0, g: 1, b: 1, a: 1}
+    m_colorO: {r: 1, g: 1, b: 0, a: 1}
+    m_colorT: {r: 0.5, g: 0, b: 0.5, a: 1}
+    m_colorS: {r: 0, g: 1, b: 0, a: 1}
+    m_colorZ: {r: 1, g: 0, b: 0, a: 1}
+    m_colorJ: {r: 0, g: 0.3, b: 1, a: 1}
+    m_colorL: {r: 1, g: 0.5, b: 0, a: 1}
+  m_showBorder: 1
+  m_borderColor: {r: 0.25, g: 0.25, b: 0.25, a: 1}
+  m_borderHorizontalPrefab: {fileID: 0}
+  m_borderVerticalPrefab: {fileID: 0}
+  m_borderCornerBottomLeftPrefab: {fileID: 0}
+  m_borderCornerBottomRightPrefab: {fileID: 0}
+  m_borderCornerTopLeftPrefab: {fileID: 0}
+  m_borderCornerTopRightPrefab: {fileID: 0}
+  m_showBorderPreview: 1
+  m_showGridGizmos: 1
+  m_gridGizmoColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  m_showFullPiece: 0
+  m_previewWidth: 10
+  m_previewHeight: 20
+  m_cellPrefab: {fileID: 0}
+  m_pieceZOffset: -0.05
+--- !u!4 &1864576868
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1864576866}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -699,4 +699,4 @@ SceneRoots:
   - {fileID: 410087041}
   - {fileID: 832575519}
   - {fileID: 116733475}
-  - {fileID: 542262952}
+  - {fileID: 1864576868}

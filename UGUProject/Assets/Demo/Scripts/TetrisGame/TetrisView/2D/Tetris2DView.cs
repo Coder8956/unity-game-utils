@@ -59,7 +59,7 @@ namespace ZNGTetris.View
             {
                 GameObject go = Instantiate(prefab, transform, false);
                 go.transform.localPosition = localPos;
-                go.transform.localScale = Vector3.one * m_cellSize;
+                go.transform.localScale = GetBorderElementScale(go);
                 return go;
             }
 
@@ -101,6 +101,26 @@ namespace ZNGTetris.View
                 size.x > 0f ? m_cellSize / size.x : m_cellSize,
                 size.y > 0f ? m_cellSize / size.y : m_cellSize,
                 1f);
+        }
+
+        /// <summary>
+        /// 根据预制体上 SpriteRenderer 的精灵原生尺寸计算缩放，
+        /// 使渲染后的世界尺寸等于 m_cellSize × m_cellSize。
+        /// 无 SpriteRenderer 时回退到 Vector3.one * m_cellSize。
+        /// </summary>
+        private Vector3 GetBorderElementScale(GameObject go)
+        {
+            var sr = go.GetComponentInChildren<SpriteRenderer>(true);
+            if (sr != null && sr.sprite != null)
+            {
+                Vector3 size = sr.sprite.bounds.size;
+                return new Vector3(
+                    size.x > 0f ? m_cellSize / size.x : m_cellSize,
+                    size.y > 0f ? m_cellSize / size.y : m_cellSize,
+                    1f);
+            }
+
+            return Vector3.one * m_cellSize;
         }
 
         /// <summary>
