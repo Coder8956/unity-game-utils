@@ -11,6 +11,20 @@ namespace ZNGTetris.View
     [ExecuteAlways]
     public abstract class TetrisViewBase : MonoBehaviour, ITetrisView
     {
+        // ── 嵌套类型 ─────────────────────────────────────────────
+
+        /// <summary>
+        /// 边框拐角位置。<see cref="None"/> 表示非拐角元素。
+        /// </summary>
+        protected enum BorderCorner
+        {
+            None,
+            BottomLeft,
+            BottomRight,
+            TopLeft,
+            TopRight
+        }
+
         // ── Inspector 字段 ────────────────────────────────────────
 
         [Header("显示配置")]
@@ -33,8 +47,17 @@ namespace ZNGTetris.View
         [Tooltip("竖直边框元素预制体（为空时使用默认单位元素）")]
         [SerializeField] protected GameObject m_borderVerticalPrefab;
 
-        [Tooltip("拐角边框元素预制体（为空时使用默认单位元素）")]
-        [SerializeField] protected GameObject m_borderCornerPrefab;
+        [Tooltip("左下拐角边框元素预制体（为空时使用默认单位元素）")]
+        [SerializeField] protected GameObject m_borderCornerBottomLeftPrefab;
+
+        [Tooltip("右下拐角边框元素预制体（为空时使用默认单位元素）")]
+        [SerializeField] protected GameObject m_borderCornerBottomRightPrefab;
+
+        [Tooltip("左上拐角边框元素预制体（为空时使用默认单位元素）")]
+        [SerializeField] protected GameObject m_borderCornerTopLeftPrefab;
+
+        [Tooltip("右上拐角边框元素预制体（为空时使用默认单位元素）")]
+        [SerializeField] protected GameObject m_borderCornerTopRightPrefab;
 
         [Header("预览配置")]
         [Tooltip("是否在编辑模式下开启边框预览（Scene 和 Game 窗口均可见）")]
@@ -265,8 +288,8 @@ namespace ZNGTetris.View
         /// 创建边框元素视觉对象（由子类实现具体的渲染方式）。
         /// </summary>
         /// <param name="isHorizontal">true 表示水平方向（上下边），false 表示竖直方向（左右边）</param>
-        /// <param name="isCorner">true 表示拐角元素</param>
-        protected virtual GameObject CreateBorderElement(bool isHorizontal, bool isCorner, Vector3 localPos)
+        /// <param name="corner">拐角位置，<see cref="BorderCorner.None"/> 表示非拐角元素</param>
+        protected virtual GameObject CreateBorderElement(bool isHorizontal, BorderCorner corner, Vector3 localPos)
         {
             return null;
         }
@@ -292,25 +315,25 @@ namespace ZNGTetris.View
 
             // 下边水平元素 (y = -1)
             for (int x = 0; x < width; x++)
-                m_borderElements[index++] = CreateBorderElement(true, false, BoardToWorld(x, -1, width, height));
+                m_borderElements[index++] = CreateBorderElement(true, BorderCorner.None, BoardToWorld(x, -1, width, height));
 
             // 上边水平元素 (y = height)
             for (int x = 0; x < width; x++)
-                m_borderElements[index++] = CreateBorderElement(true, false, BoardToWorld(x, height, width, height));
+                m_borderElements[index++] = CreateBorderElement(true, BorderCorner.None, BoardToWorld(x, height, width, height));
 
             // 左边竖直元素 (x = -1)
             for (int y = 0; y < height; y++)
-                m_borderElements[index++] = CreateBorderElement(false, false, BoardToWorld(-1, y, width, height));
+                m_borderElements[index++] = CreateBorderElement(false, BorderCorner.None, BoardToWorld(-1, y, width, height));
 
             // 右边竖直元素 (x = width)
             for (int y = 0; y < height; y++)
-                m_borderElements[index++] = CreateBorderElement(false, false, BoardToWorld(width, y, width, height));
+                m_borderElements[index++] = CreateBorderElement(false, BorderCorner.None, BoardToWorld(width, y, width, height));
 
             // 四个拐角
-            m_borderElements[index++] = CreateBorderElement(false, true, BoardToWorld(-1, -1, width, height));
-            m_borderElements[index++] = CreateBorderElement(false, true, BoardToWorld(width, -1, width, height));
-            m_borderElements[index++] = CreateBorderElement(false, true, BoardToWorld(-1, height, width, height));
-            m_borderElements[index++] = CreateBorderElement(false, true, BoardToWorld(width, height, width, height));
+            m_borderElements[index++] = CreateBorderElement(false, BorderCorner.BottomLeft, BoardToWorld(-1, -1, width, height));
+            m_borderElements[index++] = CreateBorderElement(false, BorderCorner.BottomRight, BoardToWorld(width, -1, width, height));
+            m_borderElements[index++] = CreateBorderElement(false, BorderCorner.TopLeft, BoardToWorld(-1, height, width, height));
+            m_borderElements[index++] = CreateBorderElement(false, BorderCorner.TopRight, BoardToWorld(width, height, width, height));
         }
 
         /// <summary>

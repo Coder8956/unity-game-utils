@@ -74,11 +74,16 @@ namespace ZNGTetris.View
             }
         }
 
-        protected override GameObject CreateBorderElement(bool isHorizontal, bool isCorner, Vector3 localPos)
+        protected override GameObject CreateBorderElement(bool isHorizontal, BorderCorner corner, Vector3 localPos)
         {
-            GameObject prefab = isCorner ? m_borderCornerPrefab :
-                                 isHorizontal ? m_borderHorizontalPrefab :
-                                 m_borderVerticalPrefab;
+            GameObject prefab = corner switch
+            {
+                BorderCorner.BottomLeft  => m_borderCornerBottomLeftPrefab,
+                BorderCorner.BottomRight => m_borderCornerBottomRightPrefab,
+                BorderCorner.TopLeft     => m_borderCornerTopLeftPrefab,
+                BorderCorner.TopRight    => m_borderCornerTopRightPrefab,
+                _ => isHorizontal ? m_borderHorizontalPrefab : m_borderVerticalPrefab,
+            };
 
             GameObject go;
             if (prefab != null)
@@ -90,7 +95,7 @@ namespace ZNGTetris.View
             else
             {
                 go = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                go.name = isCorner ? "Border_Corner" : isHorizontal ? "Border_H" : "Border_V";
+                go.name = corner != BorderCorner.None ? $"Border_Corner_{corner}" : isHorizontal ? "Border_H" : "Border_V";
                 go.transform.SetParent(transform, false);
                 go.transform.localPosition = localPos;
                 go.transform.localScale = Vector3.one * m_cellSize;

@@ -163,7 +163,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d44d96f033833e143b8a9703bd31e3c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZNGTetris.Logic.TetrisGame
-  m_boardWidth: 30
+  m_boardWidth: 10
   m_boardHeight: 20
   m_baseFallInterval: 0.8
   m_levelSpeedStep: 0.05
@@ -396,7 +396,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -705}
+  m_LocalPosition: {x: 0, y: 0, z: -545}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -630,12 +630,15 @@ MonoBehaviour:
   m_borderColor: {r: 0.25, g: 0.25, b: 0.25, a: 1}
   m_borderHorizontalPrefab: {fileID: 0}
   m_borderVerticalPrefab: {fileID: 0}
-  m_borderCornerPrefab: {fileID: 0}
+  m_borderCornerBottomLeftPrefab: {fileID: 0}
+  m_borderCornerBottomRightPrefab: {fileID: 0}
+  m_borderCornerTopLeftPrefab: {fileID: 0}
+  m_borderCornerTopRightPrefab: {fileID: 0}
   m_showBorderPreview: 1
   m_showGridGizmos: 1
   m_gridGizmoColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   m_showFullPiece: 0
-  m_previewWidth: 30
+  m_previewWidth: 10
   m_previewHeight: 20
   m_cellMaterial: {fileID: 0}
   m_pieceZOffset: -0.05
