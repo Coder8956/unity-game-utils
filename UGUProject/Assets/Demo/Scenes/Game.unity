@@ -634,6 +634,9 @@ MonoBehaviour:
   m_showBorderPreview: 1
   m_showGridGizmos: 1
   m_gridGizmoColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  m_showFullPiece: 0
+  m_previewWidth: 30
+  m_previewHeight: 20
   m_cellMaterial: {fileID: 0}
   m_pieceZOffset: -0.05
 --- !u!1 &832575517

@@ -46,6 +46,10 @@ namespace ZNGTetris.View
         [Tooltip("行列辅助线和行列号的颜色")]
         [SerializeField] protected Color m_gridGizmoColor = Color.yellow;
 
+        [Header("Debug")]
+        [Tooltip("为 true 时完整显示方块（包括棋盘外的格子）；为 false 时只显示棋盘内的格子")]
+        [SerializeField] protected bool m_showFullPiece;
+
         // ── 私有字段（运行时状态）────────────────────────────────
 
         protected int m_boardWidth;
@@ -55,7 +59,10 @@ namespace ZNGTetris.View
         protected GameObject[] m_borderElements;
         protected bool m_initialized;
 
+        [SerializeField, HideInInspector]
         private int m_previewWidth;
+
+        [SerializeField, HideInInspector]
         private int m_previewHeight;
 
         // ── 属性 ─────────────────────────────────────────────────
@@ -103,8 +110,7 @@ namespace ZNGTetris.View
 
         protected virtual void OnEnable()
         {
-            if (!Application.isPlaying)
-                RefreshBorderPreview();
+            RefreshBorderPreview();
 
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
@@ -200,9 +206,10 @@ namespace ZNGTetris.View
             RebuildBoardVisuals(board);
         }
 
-        public virtual void OnGameOver()
+        public virtual void OnGameOver(TetrisBoard board)
         {
-            // 子类可重写以添加游戏结束视觉效果
+            HidePieceVisuals();
+            RebuildBoardVisuals(board);
         }
 
         /// <summary>
@@ -350,23 +357,23 @@ namespace ZNGTetris.View
 
             float halfCell = m_cellSize * 0.5f;
 
-            // 列辅助线（竖直）— 画在格子边界上
+            // 列辅助线（竖直）— 画在格子边界上，从底部边框外缘延伸到顶部边框外缘
             for (int x = 0; x <= width; x++)
             {
                 Vector3 bottom = transform.TransformPoint(
-                    BoardToWorld(x - 1, -1, width, height) + new Vector3(halfCell, 0f, 0f));
+                    BoardToWorld(x - 1, -1, width, height) + new Vector3(halfCell, -halfCell, 0f));
                 Vector3 top = transform.TransformPoint(
-                    BoardToWorld(x - 1, height, width, height) + new Vector3(halfCell, 0f, 0f));
+                    BoardToWorld(x - 1, height, width, height) + new Vector3(halfCell, halfCell, 0f));
                 Gizmos.DrawLine(bottom, top);
             }
 
-            // 行辅助线（水平）— 画在格子边界上
+            // 行辅助线（水平）— 画在格子边界上，从左侧边框外缘延伸到右侧边框外缘
             for (int y = 0; y <= height; y++)
             {
                 Vector3 left = transform.TransformPoint(
-                    BoardToWorld(-1, y - 1, width, height) + new Vector3(0f, halfCell, 0f));
+                    BoardToWorld(-1, y - 1, width, height) + new Vector3(-halfCell, halfCell, 0f));
                 Vector3 right = transform.TransformPoint(
-                    BoardToWorld(width, y - 1, width, height) + new Vector3(0f, halfCell, 0f));
+                    BoardToWorld(width, y - 1, width, height) + new Vector3(halfCell, halfCell, 0f));
                 Gizmos.DrawLine(left, right);
             }
 
@@ -392,24 +399,29 @@ namespace ZNGTetris.View
 #endif
 
         /// <summary>
-        /// 刷新编辑模式下的边框预览。
-        /// 在非运行状态且未初始化时，根据 m_showBorderPreview 和已接收的棋盘尺寸创建或清除实际边框 GameObject。
+        /// 刷新边框预览。
+        /// 在未初始化时，根据 m_showBorderPreview 和已接收的棋盘尺寸创建或清除实际边框 GameObject。
         /// 棋盘尺寸由 TetrisGame 通过 SetPreviewBoardSize 推送，显示层不主动查找逻辑类。
-        /// 预览对象设置 <see cref="HideAndDontSave"/> 标记，不会写入场景文件。
+        /// 编辑模式下预览对象设置 <see cref="HideAndDontSave"/> 标记，不会写入场景文件。
+        /// 运行时同样调用此方法实现边框常驻显示（忽略游戏状态）。
         /// </summary>
         protected void RefreshBorderPreview()
         {
-            if (Application.isPlaying || m_initialized)
+            if (this == null)
+                return;
+
+            if (m_initialized)
                 return;
 
             ClearBorder();
 
-            if (!m_showBorderPreview || m_previewWidth <= 0 || m_previewHeight <= 0)
+            // m_showBorderPreview 仅控制编辑模式预览；运行时只要尺寸可用就显示边框
+            if ((!m_showBorderPreview && !Application.isPlaying) || m_previewWidth <= 0 || m_previewHeight <= 0)
                 return;
 
             BuildBorder(m_previewWidth, m_previewHeight);
 
-            if (m_borderElements != null)
+            if (!Application.isPlaying && m_borderElements != null)
             {
                 for (int i = 0; i < m_borderElements.Length; i++)
                 {
@@ -434,6 +446,10 @@ namespace ZNGTetris.View
                     Vector2Int worldCell = piece.Position + cells[i];
                     Vector3 localPos = BoardToWorld(worldCell.x, worldCell.y);
 
+                    bool isInsideBoard = worldCell.x >= 0 && worldCell.x < m_boardWidth
+                                      && worldCell.y >= 0 && worldCell.y < m_boardHeight;
+                    bool shouldShow = m_showFullPiece || isInsideBoard;
+
                     if (m_pieceCells[i] == null)
                     {
                         m_pieceCells[i] = CreateCellVisual(piece.Type, localPos, true);
@@ -442,8 +458,9 @@ namespace ZNGTetris.View
                     {
                         m_pieceCells[i].transform.localPosition = localPos;
                         SetCellVisualType(m_pieceCells[i], piece.Type);
-                        m_pieceCells[i].SetActive(true);
                     }
+
+                    m_pieceCells[i].SetActive(shouldShow);
                 }
                 else
                 {

@@ -139,6 +139,7 @@ namespace ZNGTetris.Logic
             if (m_viewComponent is ITetrisView view)
             {
                 m_view = view;
+                m_view.SetPreviewBoardSize(m_boardWidth, m_boardHeight);
             }
             else if (m_viewComponent != null)
             {
@@ -415,7 +416,7 @@ namespace ZNGTetris.Logic
                 PrintBoardState(lastPiece);
             }
 
-            m_view?.OnGameOver();
+            m_view?.OnGameOver(m_board);
         }
 
         // ── 内部工具（输入处理）──────────────────────────────────

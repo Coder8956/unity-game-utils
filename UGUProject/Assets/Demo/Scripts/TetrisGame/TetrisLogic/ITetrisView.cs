@@ -24,8 +24,8 @@ namespace ZNGTetris.Logic
         /// <summary>消行完成时调用，传入被清除的行号数组和当前棋盘状态</summary>
         void OnLinesCleared(int[] clearedRows, TetrisBoard board);
 
-        /// <summary>游戏结束时调用</summary>
-        void OnGameOver();
+        /// <summary>游戏结束时调用，传入最终棋盘状态供显示层更新视觉</summary>
+        void OnGameOver(TetrisBoard board);
 
         /// <summary>设置编辑模式预览的棋盘尺寸（由 TetrisGame 调用）</summary>
         void SetPreviewBoardSize(int width, int height);
